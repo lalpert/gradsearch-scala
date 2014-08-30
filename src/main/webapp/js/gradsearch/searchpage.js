@@ -13,8 +13,8 @@ var SearchPage = React.createClass({
     getDefaultProps: function() {
       return {
          profArray: [
-         {"name": "Leah", "school": "MIT"},
-         {"name": "Russell", "school": "MIT"},
+         {"name": "Leah", "school": "MIT", "id":1},
+         {"name": "Russell", "school": "MIT", "id":7},
          ]
        }
      },
@@ -45,7 +45,7 @@ var ProfSection = React.createClass({
 
   render: function() {
     allProfs = this.props.profArray.map(function(prof) {
-      return <ProfBox profData={prof}/>;
+      return <ProfBox profData={prof} key={prof.id}/>;
     });
 
     return <div> {allProfs} </div>;
