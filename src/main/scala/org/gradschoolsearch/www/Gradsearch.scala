@@ -6,6 +6,12 @@ import scalate.ScalateSupport
 class Gradsearch extends GradsearchStack {
 
   get("/") {
+    contentType="text/html"
+    ssp("/home")
+  }
+
+
+  get("/search") {
     <html>
       <body>
         <h1>Hello, world!</h1>
@@ -13,5 +19,4 @@ class Gradsearch extends GradsearchStack {
       </body>
     </html>
   }
-  
 }

@@ -1,0 +1,4 @@
+#set (title)
+#end
+
+React.renderComponent()
