@@ -8,6 +8,7 @@
   <script src="/js/react/react.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
   <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
+  <script scr="/js/jquery/jquery-1.11.1.min.js"></script>
   <script src="/js/bootstrap/bootstrap.js"></script>
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
