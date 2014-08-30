@@ -4,12 +4,12 @@
 
 <div id="container">
 <div class="jumbotron">
-    <h1>Navbar example</h1>
-    <p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
-    <p>To see the difference between static and fixed top navbars, just scroll.</p>
-    <p>
-      <a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>
-    </p>
+    <h1>re:search</h1>
+    <p>What are you interested in?</p>
+    <form id="search" action="search">
+        <input class="xlarge" name="q" type="text" size="30">
+        <input type="submit" value="Go" class="btn primary">
+    </form>
 </div>
 
 <!--<script type="text/jsx">
