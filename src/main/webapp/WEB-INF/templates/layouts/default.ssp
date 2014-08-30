@@ -7,14 +7,17 @@
   <title>Gradsearch ${title}</title>
   <script src="/js/react/react.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
+  <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
 </head>
 
 <body>
   <p>Test header!!</p>
   <p>Test 2</p>
-  <div id="container">
-    ${body}
-  </div>
+    <div id="container">
+
+    </div>
+  ${unescape(body)}
+
   <p>Copyright Leah and Russell Productions</p>
 </body>
 
