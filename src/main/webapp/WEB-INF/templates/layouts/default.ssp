@@ -5,7 +5,8 @@
 <html>
 <head>
   <title>Gradsearch ${title}</title>
-  
+  <script src="/js/react/react.js"></script>
+  <script src="/js/react/JSXTransformer.js"></script>
 </head>
 
 <body>
