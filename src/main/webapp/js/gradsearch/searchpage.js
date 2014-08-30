@@ -6,42 +6,44 @@
 var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string,
-    profArray: React.PropTypes.array
   },
 
- // JUST for testing! replace with []
-    getDefaultProps: function() {
-      return {
-         profArray: [
-         {"name": "Leah", "school": "MIT", "id":1},
-         {"name": "Russell", "school": "MIT", "id":7},
-         ]
-       }
-     },
+  getInitialState: function() {
+    return {
+       profArray: []
+    }
+  },
 
   render: function() {
+    var profArray = this.state.profArray;
+    numProfs = profArray ? profArray.length : "";
     return (
       <div className="searchpage">
-      Professors researching {this.props.searchString}!
-      <ProfSection profArray={this.props.profArray}/>
+      {numProfs} Professors researching {this.props.searchString}
+      <ProfSection profArray={profArray}/>
       </div>
     );
   },
 
   componentDidMount: function() {
-    // ajax call to get actual prof data
+    // Get the search results
+    var url = "/results?q=" + encodeURIComponent(this.props.searchString);
+    var self = this;
+    var jqxhr = $.get(url, function(data) {
+      self.setState({profArray: data});
+    })
   }
 });
 
 /**
  * Section containing boxes for all profs
  */
+
+ // TODO: Animate moving boxes
 var ProfSection = React.createClass({
   propTypes: {
     profArray: React.PropTypes.array
   },
-
-
 
   render: function() {
     allProfs = this.props.profArray.map(function(prof) {
@@ -49,10 +51,6 @@ var ProfSection = React.createClass({
     });
 
     return <div> {allProfs} </div>;
-  },
-
-  componentDidUpdate: function() {
-    // Animate moving boxes?? or does that go somewhere else?
   }
 });
 
