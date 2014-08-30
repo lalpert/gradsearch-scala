@@ -10,17 +10,20 @@ var SearchPage = React.createClass({
 
   getInitialState: function() {
     return {
-       profArray: []
+       allProfs: [],
+       visibleProfs: [],
+       // TODO: figure out how filters are saved
+       filters: {},
     }
   },
 
   render: function() {
-    var profArray = this.state.profArray;
-    numProfs = profArray ? profArray.length : "";
+    var visibleProfs = this.state.visibleProfs;
+    numProfs = visibleProfs ? visibleProfs.length : "";
     return (
       <div className="searchpage">
       {numProfs} Professors researching {this.props.searchString}
-      <ProfSection profArray={profArray}/>
+      <ProfSection profArray={visibleProfs}/>
       </div>
     );
   },
@@ -30,7 +33,10 @@ var SearchPage = React.createClass({
     var url = "/results?q=" + encodeURIComponent(this.props.searchString);
     var self = this;
     var jqxhr = $.get(url, function(data) {
-      self.setState({profArray: data});
+      self.setState({
+        allProfs: data,
+        visibleProfs: data
+      });
     })
   }
 });
@@ -38,8 +44,6 @@ var SearchPage = React.createClass({
 /**
  * Section containing boxes for all profs
  */
-
- // TODO: Animate moving boxes
 var ProfSection = React.createClass({
   propTypes: {
     profArray: React.PropTypes.array
@@ -50,7 +54,9 @@ var ProfSection = React.createClass({
       return <ProfBox profData={prof} key={prof.id}/>;
     });
 
-    return <div> {allProfs} </div>;
+    return <div className="container-fluid">
+      {allProfs}
+    </div>;
   }
 });
 
@@ -70,10 +76,72 @@ var ProfBox = React.createClass({
     };
 
     return (
-      <div className="prof-box" style={divStyle}>
-      <p>Name: {this.props.profData.name}</p>
-      <p>School: {this.props.profData.school}</p>
+
+    <div className="media">
+      <a className="pull-left" href="#">
+        <img className="media-object" data-src="holder.js/64x64" alt="Generic placeholder image"/>
+      </a>
+      <div className="media-body">
+        <h4 className="media-heading">{this.props.profData.name}</h4>
+        <p>{this.props.profData.school}</p>
       </div>
+    </div>
+
     );
   }
 });
+
+/* TODO: finish implementing filters
+
+//Sidebar with filters
+var FilterBar = React.createClass({
+  propTypes: {
+    // Array of objects containing name, num, and checked for each option
+    universities: React.propTypes.array,
+    departments: React.propTypes.array,
+    starred: React.propTypes.array,
+  },
+
+
+  //Return div containing checkboxes for each option
+
+  makeSection: function(attribute) {
+    // TODO: get underscore and do fancy filtering
+  }
+
+  render: function() {
+    //var starred
+    var universities = makeSection("school");
+    var departments = makeSection("department");
+
+    return <div>
+      <h3>Filter results by:</h3>
+
+      <h4>Starred</h4>
+      <FilterSection title="Starred" choices={starred}/>
+
+      <h4>University</h4>
+      <FilterSection title="University" choices={universities}/>
+
+      <h4>Department</h4>
+      <FilterSection title="Department" choices={departments}/>
+    </div>
+  }
+});
+
+
+
+// Filter section, such as University or Department
+var FilterSection = React.createClass({
+  propTypes: {
+    title: React.PropTypes.string,
+    // Array of objects with title and number
+    choices: React.PropTypes.array,
+  },
+
+  render: function() {
+
+  }
+});
+
+*/
