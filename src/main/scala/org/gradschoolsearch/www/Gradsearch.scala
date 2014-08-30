@@ -30,7 +30,8 @@ class Gradsearch extends GradsearchStack with JacksonJsonSupport{
 
   get("/search") {
     contentType="text/html"
-    ssp("/search", "search" -> "xxx")
+    val searchString = request.getParameter("q")
+    ssp("/search", "search" -> searchString)
   }
 
   get("/results") {
