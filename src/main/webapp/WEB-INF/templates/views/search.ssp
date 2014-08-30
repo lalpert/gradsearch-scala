@@ -2,4 +2,12 @@
 #end
 
 <%@ val search: String %>
-<p>Professors researching <%= search %></p>
+
+<script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
+<script type="text/jsx">
+/** @jsx React.DOM */
+React.renderComponent(
+    <SearchPage searchString="<%= search %>"/>,
+    document.getElementById('container')
+);
+</script>
