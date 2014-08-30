@@ -1,4 +1,9 @@
 #set (title)
 #end
 
-React.renderComponent()
+<script type="text/jsx">
+/** @jsx React.DOM */
+React.renderComponent(
+    <HelloWorld name="Russell"/>, document.getElementById('container')
+);
+</script>
