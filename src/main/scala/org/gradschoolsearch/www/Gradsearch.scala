@@ -43,9 +43,15 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/results") {
     db withDynSession {
       // Iterate through all profs and output them
-      professors.run
-      //professors.map(p => Professor(p.id, p.name, p.school)).run
+      val searchString = request.getParameter("q").toLowerCase
 
+      val profKeywordJoin = for {
+        pk <- professorKeywords
+        k <- keywords if k.id === pk.keywordId && k.keyword === searchString
+        p <- professors if p.id === pk.profId
+      } yield (p)
+
+      profKeywordJoin.run
     }
   }
 
