@@ -49,7 +49,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
         pk <- professorKeywords
         k <- keywords if k.id === pk.keywordId && k.keyword === searchString
         p <- professors if p.id === pk.profId
-      } yield (p)
+      } yield p
 
       profKeywordJoin.run
     }

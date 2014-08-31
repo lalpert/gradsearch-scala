@@ -57,20 +57,16 @@ var SearchPage = React.createClass({
 var ProfSection = React.createClass({
   propTypes: {
     profArray: React.PropTypes.array,
-    hidden: React.PropTypes.bool.isRequired
   },
 
   render: function() {
     allProfs = this.props.profArray.map(function(prof) {
       return <ProfBox profData={prof} key={prof.id}/>;
     });
-    if (this.props.hidden) {
-        return <div className="container-fluid"/>;
-    } else {
-        return <div className="container-fluid">
-           {allProfs}
-        </div>;
-    }
+
+    return <div className="container-fluid">
+       {allProfs}
+    </div>;
   }
 });
 
@@ -136,7 +132,7 @@ var FilterSection = React.createClass({
   },
 
   render: function() {
-     var options = _.map(this.props.choices, function(name, num) {
+     var options = _.map(this.props.choices, function(num, name) {
         return <div>{name} ({num})</div>
      });
      return <div>
