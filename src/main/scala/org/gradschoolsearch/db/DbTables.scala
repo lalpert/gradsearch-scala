@@ -21,7 +21,7 @@ object Tables {
   }
   val keywords = TableQuery[Keywords]
 
-  class ProfessorKeywords(tag: Tag) extends Table[()](tag, "PROFESSOR_KEYWORDS") {
+  class ProfessorKeywords(tag: Tag) extends Table[(Int, Int)](tag, "PROFESSOR_KEYWORDS") {
     def profId = column[Int]("PROF_ID")
     def keywordId = column[Int]("KEYWORD_ID")
     // TODO: maybe add this:

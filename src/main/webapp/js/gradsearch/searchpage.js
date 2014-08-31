@@ -3,6 +3,7 @@
 /**
  * The entire search page
  */
+
 var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string,
@@ -12,22 +13,27 @@ var SearchPage = React.createClass({
     return {
        allProfs: [],
        visibleProfs: [],
-       hidden: false
+       filters: []
     }
   },
 
   handleFilterChange: function(hidden) {
-    this.setState({hidden: hidden});
+    this.setState({filters: filters});
+  },
+
+  getUniData: function() {
+    return _.countBy(this.state.visibleProfs, function(prof) { return prof["school"] });
   },
 
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     numProfs = visibleProfs ? visibleProfs.length : "";
+    var uniData = this.getUniData();
     return (
       <div className="searchpage">
         {numProfs} Professors researching {this.props.searchString}
-        <ProfSection profArray={visibleProfs} hidden={this.state.hidden}/>
-        <FilterBar onChange={this.handleFilterChange} checked={!this.state.hidden}/>
+        <ProfSection profArray={visibleProfs} filters={this.state.filters}/>
+        <FilterBar onChange={this.handleFilterChange} filters={this.state.filters} uniChoices={uniData}/>
       </div>
     );
   },
@@ -102,67 +108,40 @@ var ProfBox = React.createClass({
 var FilterBar = React.createClass({
       propTypes: {
         onChange: React.PropTypes.func,
-        checked: React.PropTypes.bool
+        filters: React.PropTypes.array,
+        uniChoices: React.PropTypes.object.isRequired
       },
+
       handleChange: function(event) {
-        this.props.onChange(event.target.checked);
+        var filterFunc = function(data) {
+            return event.target.checked;
+        }
+        //this.props.onChange([filterFunc]);
       },
+
       render: function() {
-        var checked = this.props.checks;
-        return <input type="checkbox" checked={checked} onChange={this.handleChange} />;
+        var checked = this.props.checked;
+        return <div>
+            <FilterSection title="University" choices={this.props.uniChoices}/>
+        </div>
       }
 });
-/* TODO: finish implementing filters
 
-//Sidebar with filters
-var FilterBar = React.createClass({
-  propTypes: {
-    // Array of objects containing name, num, and checked for each option
-    universities: React.propTypes.array,
-    departments: React.propTypes.array,
-    starred: React.propTypes.array,
-  },
-
-
-  //Return div containing checkboxes for each option
-
-  makeSection: function(attribute) {
-    // TODO: get underscore and do fancy filtering
-  }
-
-  render: function() {
-    //var starred
-    var universities = makeSection("school");
-    var departments = makeSection("department");
-
-    return <div>
-      <h3>Filter results by:</h3>
-
-      <h4>Starred</h4>
-      <FilterSection title="Starred" choices={starred}/>
-
-      <h4>University</h4>
-      <FilterSection title="University" choices={universities}/>
-
-      <h4>Department</h4>
-      <FilterSection title="Department" choices={departments}/>
-    </div>
-  }
-});
-
-
-
-// Filter section, such as University or Department
+//Filter section, such as University or Department
 var FilterSection = React.createClass({
   propTypes: {
-    title: React.PropTypes.string,
+    title: React.PropTypes.string.isRequired,
     // Array of objects with title and number
     choices: React.PropTypes.array,
   },
 
   render: function() {
-
+     var options = _.map(this.props.choices, function(name, num) {
+        return <div>{name} ({num})</div>
+     });
+     return <div>
+        {this.props.title}
+        {options}
+     </div>
   }
 });
-
-*/
