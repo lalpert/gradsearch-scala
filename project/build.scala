@@ -28,6 +28,9 @@ object GradsearchBuild extends Build {
         "org.scalatra" %% "scalatra-json" % "2.3.0",
         "org.json4s"   %% "json4s-jackson" % "3.2.9",
         "ch.qos.logback" % "logback-classic" % "1.0.6" % "runtime",
+        "com.typesafe.slick" %% "slick" % "2.1.0",
+        "com.h2database" % "h2" % "1.3.166",
+        "c3p0" % "c3p0" % "0.9.1.2",
         "org.eclipse.jetty" % "jetty-webapp" % "9.1.3.v20140225" % "container",
         "org.eclipse.jetty" % "jetty-plus" % "9.1.3.v20140225" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))

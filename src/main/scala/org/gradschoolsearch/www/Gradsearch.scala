@@ -1,5 +1,8 @@
 package org.gradschoolsearch.www
 
+import org.gradschoolsearch.db.{DbRoutes, Tables}
+import Tables._
+
 import org.scalatra._
 import scalate.ScalateSupport
 
@@ -9,10 +12,13 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
+import scala.slick.driver.H2Driver.simple._
+import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
-case class Professor(id:Int, name:String, school:String)
 
-class Gradsearch extends GradsearchStack with JacksonJsonSupport{
+
+class Gradsearch(val db: Database) extends GradsearchStack
+  with JacksonJsonSupport with DbRoutes{
   // Sets up automatic case class to JSON output serialization, required by
   // the JValueResult trait.
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -22,7 +28,7 @@ class Gradsearch extends GradsearchStack with JacksonJsonSupport{
     contentType = formats("json")
   }
 
-
+  // Website routes
   get("/") {
     contentType="text/html"
     ssp("/home")
@@ -35,11 +41,13 @@ class Gradsearch extends GradsearchStack with JacksonJsonSupport{
   }
 
   get("/results") {
-    // TODO: Get search results from db
-    // For now, just use these fake results
-    val prof1 = Professor(1, "Leah Alpert", "MIT")
-    val prof2 = Professor(7, "Russell Cohen", "MIT")
-    val profs = List(prof1, prof2)
-    profs
+    db withDynSession {
+      // Iterate through all profs and output them
+      professors.run
+      //professors.map(p => Professor(p.id, p.name, p.school)).run
+
+    }
   }
+
+
 }
