@@ -1,8 +1,11 @@
-/** @jsx React.DOM */
+/**
+ * @jsx React.DOM
+ */
 
 /**
- * The entire search page
+ * The entire search page.
  */
+ define(function() {
 var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string,
@@ -22,8 +25,8 @@ var SearchPage = React.createClass({
     numProfs = visibleProfs ? visibleProfs.length : "";
     return (
       <div className="searchpage">
-      {numProfs} Professors researching {this.props.searchString}
-      <ProfSection profArray={visibleProfs}/>
+        {numProfs} Professors researching {this.props.searchString}
+        <ProfSection profArray={visibleProfs}/>
       </div>
     );
   },
@@ -89,6 +92,9 @@ var ProfBox = React.createClass({
 
     );
   }
+});
+
+return {SearchPage: SearchPage};
 });
 
 /* TODO: finish implementing filters

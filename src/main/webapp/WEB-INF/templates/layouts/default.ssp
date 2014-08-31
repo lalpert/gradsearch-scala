@@ -1,17 +1,31 @@
 <%@ var body: String %>
 <%@ var title: String %>
 <%@ var head: String = "" %>
+<%@ var requirejs: String = "" %>
 
 <html>
 <head>
   <title>Gradsearch ${title}</title>
   <script src="/js/react/react.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
-  <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
+
   <script src="/js/jquery/jquery-1.11.1.min.js"></script>
+
+  <!-- bootstrap css & js -->
   <script src="/js/bootstrap/bootstrap.js"></script>
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
+
+  <script src="js/require.js"></script>
+  <script>
+    require(['./js/common'], function (common) {
+    //Load common code that includes config, then load the app
+    //logic for this page. Do the require calls here instead of
+    //a separate file so after a build there are only 2 HTTP
+    //requests instead of three.
+        require([${unescape(requirejs)}]);
+    });
+  </script>
 </head>
 
 <body>

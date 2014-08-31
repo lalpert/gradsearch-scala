@@ -1,6 +1,7 @@
 #set (title)
 #end
-
+#set (requirejs)
+#end
 
 <div id="container">
 <div class="jumbotron">

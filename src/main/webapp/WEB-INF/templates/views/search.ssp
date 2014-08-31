@@ -1,15 +1,20 @@
 #set (title)
 #end
 
+#set (requirejs)
+"jsx!js/gradsearch/searchpage.js"
+#end
+
 <%@ val search: String %>
 
 <div id="container"></div>
 
-<script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
 <script type="text/jsx">
 /** @jsx React.DOM */
+var SearchPage = require(['jsx!searchpage.js']);
+alert(SearchPage);
 React.renderComponent(
     <SearchPage searchString="<%= search %>"/>,
     document.getElementById('container')
-);
+)
 </script>
