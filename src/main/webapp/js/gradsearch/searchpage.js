@@ -12,9 +12,12 @@ var SearchPage = React.createClass({
     return {
        allProfs: [],
        visibleProfs: [],
-       // TODO: figure out how filters are saved
-       filters: {},
+       hidden: false
     }
+  },
+
+  handleFilterChange: function(hidden) {
+    this.setState({hidden: hidden});
   },
 
   render: function() {
@@ -22,8 +25,9 @@ var SearchPage = React.createClass({
     numProfs = visibleProfs ? visibleProfs.length : "";
     return (
       <div className="searchpage">
-      {numProfs} Professors researching {this.props.searchString}
-      <ProfSection profArray={visibleProfs}/>
+        {numProfs} Professors researching {this.props.searchString}
+        <ProfSection profArray={visibleProfs} hidden={this.state.hidden}/>
+        <FilterBar onChange={this.handleFilterChange} checked={!this.state.hidden}/>
       </div>
     );
   },
@@ -46,17 +50,21 @@ var SearchPage = React.createClass({
  */
 var ProfSection = React.createClass({
   propTypes: {
-    profArray: React.PropTypes.array
+    profArray: React.PropTypes.array,
+    hidden: React.PropTypes.bool.isRequired
   },
 
   render: function() {
     allProfs = this.props.profArray.map(function(prof) {
       return <ProfBox profData={prof} key={prof.id}/>;
     });
-
-    return <div className="container-fluid">
-      {allProfs}
-    </div>;
+    if (this.props.hidden) {
+        return <div className="container-fluid"/>;
+    } else {
+        return <div className="container-fluid">
+           {allProfs}
+        </div>;
+    }
   }
 });
 
@@ -91,6 +99,19 @@ var ProfBox = React.createClass({
   }
 });
 
+var FilterBar = React.createClass({
+      propTypes: {
+        onChange: React.PropTypes.func,
+        checked: React.PropTypes.bool
+      },
+      handleChange: function(event) {
+        this.props.onChange(event.target.checked);
+      },
+      render: function() {
+        var checked = this.props.checks;
+        return <input type="checkbox" checked={checked} onChange={this.handleChange} />;
+      }
+});
 /* TODO: finish implementing filters
 
 //Sidebar with filters
