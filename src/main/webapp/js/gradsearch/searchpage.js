@@ -122,8 +122,11 @@ var ProfBox = React.createClass({
     profData: React.PropTypes.object
   },
 
-  render: function() {
+  formatKeywords: function(keywords) {
+    return keywords.join(", ");
+  },
 
+  render: function() {
     var prof = this.props.profData;
     var divStyle = {
       border: '1px solid blue',
@@ -132,15 +135,15 @@ var ProfBox = React.createClass({
     };
 
     return (
-
     <div className="media">
       <a className="pull-left" href="#">
-        <img className="media-object" data-src="holder.js/64x64" alt="Generic placeholder image"/>
+        <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
       </a>
       <div className="media-body">
         <h4 className="media-heading">{this.props.profData.name}</h4>
         <p>{prof.school}</p>
         <p>{prof.department}</p>
+        <p>{this.formatKeywords(prof.keywords)}</p>
       </div>
     </div>
 
