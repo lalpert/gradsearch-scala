@@ -77,14 +77,14 @@ var SearchPage = React.createClass({
     var visibleProfs = this.state.visibleProfs;
     var numProfs = visibleProfs.length ? visibleProfs.length : "";
     return (
-      <div className="container">
+      <div className="search-container">
         {numProfs} Professors researching {this.props.searchString}
-        <ProfSection profArray={visibleProfs} />
         <FilterBar
            onChange={this.updateFilters}
            filterOptions={this.state.filterOptions}
            selectedFilters={this.state.selectedFilters}
         />
+        <ProfSection profArray={visibleProfs} />
       </div>
     );
   },
@@ -194,7 +194,10 @@ var FilterBar = React.createClass({
 
   render: function() {
     var checked = this.props.checked;
-    return <div>
+    var filterStyle = {
+        height: "100%"
+    }
+    return <div className="col-xs-6 col-sm-3 sidebar-offcanvas" style={filterStyle} id="sidebar" role="navigation">
       <FilterSection
         title="University"
         choices={this.getChoices("University")}
@@ -263,9 +266,11 @@ var FilterOption = React.createClass({
     var value = this.props.value;
     var num = this.props.num;
     var checked = this.props.checked;
-    return <label>
-      <input type="checkbox" name={title} value={value} checked={checked} onChange={this.handleClick}/>
-      {value} ({num})
-    </label>
+    return <div className="checkbox">
+      <label>
+        <input type="checkbox" name={title} value={value} checked={checked} onChange={this.handleClick}/>
+        {value} ({num})
+      </label>
+    </div>
   }
 });
