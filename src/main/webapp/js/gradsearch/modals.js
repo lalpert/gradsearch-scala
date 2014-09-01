@@ -7,12 +7,19 @@ var ModalDiv = React.createClass({
   propTypes: {
     currentProf: React.PropTypes.object,
     showNextProf: React.PropTypes.func,
+    hideModal: React.PropTypes.func,
   },
 
   componentDidUpdate: function(prevProps) {
+
+    var self = this;
     if (this.props.currentProf != null) {
       $('#profModal').modal('show')
     }
+
+    $('#profModal').on('hidden.bs.modal', function (e) {
+      self.props.hideModal();
+    })
   },
 
   render: function() {

@@ -80,6 +80,10 @@ var SearchPage = React.createClass({
      this.setState({currentProfID: profId})
    },
 
+   hideModal: function() {
+     this.setState({currentProfID: null})
+   },
+
    findProf: function(profId) {
      return _.findWhere(this.state.visibleProfs, {id: profId});
    },
@@ -111,6 +115,7 @@ var SearchPage = React.createClass({
           <ModalDiv
             currentProf={currentProf}
             showNextProf={this.showNextProf}
+            hideModal={this.hideModal}
           />
         </div>
 
