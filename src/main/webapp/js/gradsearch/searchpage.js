@@ -141,6 +141,7 @@ var ProfBox = React.createClass({
         <h4 className="media-heading">{this.props.profData.name}</h4>
         <p>{prof.school}</p>
         <p>{prof.department}</p>
+        <p>{prof.keywords}</p>
       </div>
     </div>
 
