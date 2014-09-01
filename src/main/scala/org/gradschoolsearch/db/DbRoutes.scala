@@ -1,7 +1,11 @@
 package org.gradschoolsearch.db
 
+<<<<<<< HEAD
 import org.gradschoolsearch.db.DataLoader.ProfWithKeywords
 import org.gradschoolsearch.models.Professor
+=======
+import org.gradschoolsearch.models.DBProfessor
+>>>>>>> 91af8c2753e57e32278819bd5536ba4b9030191b
 import org.scalatra._
 
 import Tables._
