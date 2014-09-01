@@ -1,5 +1,6 @@
 package org.gradschoolsearch.db
 
+import org.gradschoolsearch.models.Professor
 import org.scalatra._
 
 import Tables._
@@ -14,7 +15,7 @@ trait DbRoutes extends ScalatraServlet {
   get("/db/create-data") {
     db withDynSession {
       // Create table
-
+      //val data = DataLoader.loadData()
       if (!MTable.getTables("PROFESSORS").list.isEmpty) {
         professors.ddl.drop
       }
@@ -22,6 +23,7 @@ trait DbRoutes extends ScalatraServlet {
 
       // Insert some professors
       professors.insertAll(
+        Professor(id = None, name = """Murat Acar""", school = """Yale University""", department = """Department of Biological & Biomedical Sciences"""),
         Professor(Some(1), "Leah Alpert", "MIT", "CS"),
         Professor(Some(2), "Russell Cohen", "MIT", "EE"),
         Professor(Some(3), "Fake person", "Stanford", "CS"),
@@ -29,6 +31,7 @@ trait DbRoutes extends ScalatraServlet {
         Professor(Some(4), "CS person", "MIT", "CS"),
         Professor(Some(4), "EE person", "MIT", "EE")
       )
+      //professors.insertAll(data.map(_.professor): _*)
 
       if (!MTable.getTables("KEYWORDS").list.isEmpty) {
         keywords.ddl.drop

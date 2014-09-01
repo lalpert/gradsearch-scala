@@ -1,7 +1,8 @@
 package org.gradschoolsearch.www
 
-import org.gradschoolsearch.db.{Professor, DbRoutes, Tables}
+import org.gradschoolsearch.db.{DbRoutes, Tables}
 import Tables._
+import org.gradschoolsearch.models.Professor
 
 import org.scalatra._
 import scalate.ScalateSupport
@@ -16,7 +17,7 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 case class ResultCounts(category: String, counts: Map[String, Int])
-case class Results(rawData: Seq[Professor], counts: Seq[ResultCounts])
+case class Results(professors: Seq[Professor], counts: Seq[ResultCounts])
 
 class Gradsearch(val db: Database) extends GradsearchStack
   with JacksonJsonSupport with DbRoutes {

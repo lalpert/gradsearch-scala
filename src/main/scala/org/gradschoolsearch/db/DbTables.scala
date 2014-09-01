@@ -1,8 +1,10 @@
 package org.gradschoolsearch.db
 
+import org.gradschoolsearch.models.Professor
+
 import scala.slick.driver.H2Driver.simple._
 
-case class Professor(id:Option[Int], name:String, school:String, department:String)
+
 
 object Tables {
   class Professors(tag: Tag) extends Table[Professor](tag, "PROFESSORS") {
