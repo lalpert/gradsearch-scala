@@ -1,6 +1,6 @@
 package org.gradschoolsearch.db
 
-import org.gradschoolsearch.models.Professor
+import org.gradschoolsearch.models.DBProfessor
 import org.scalatra._
 
 import Tables._
@@ -23,13 +23,13 @@ trait DbRoutes extends ScalatraServlet {
 
       // Insert some professors
       professors.insertAll(
-        Professor(id = None, name = """Murat Acar""", school = """Yale University""", department = """Department of Biological & Biomedical Sciences"""),
-        Professor(Some(1), "Leah Alpert", "MIT", "CS"),
-        Professor(Some(2), "Russell Cohen", "MIT", "EE"),
-        Professor(Some(3), "Fake person", "Stanford", "CS"),
-        Professor(Some(4), "Pretend person", "Stanford", "CS"),
-        Professor(Some(4), "CS person", "MIT", "CS"),
-        Professor(Some(4), "EE person", "MIT", "EE")
+        DBProfessor(id = None, name = """Murat Acar""", school = """Yale University""", department = """Department of Biological & Biomedical Sciences"""),
+        DBProfessor(Some(1), "Leah Alpert", "MIT", "CS"),
+        DBProfessor(Some(2), "Russell Cohen", "MIT", "EE"),
+        DBProfessor(Some(3), "Fake person", "Stanford", "CS"),
+        DBProfessor(Some(4), "Pretend person", "Stanford", "CS"),
+        DBProfessor(Some(4), "CS person", "MIT", "CS"),
+        DBProfessor(Some(4), "EE person", "MIT", "EE")
       )
       //professors.insertAll(data.map(_.professor): _*)
 

@@ -3,6 +3,8 @@ package org.gradschoolsearch.www
 import org.gradschoolsearch.db.{DbRoutes, Tables}
 import Tables._
 import org.gradschoolsearch.models.Professor
+import org.gradschoolsearch.models.DBProfessor
+import org.gradschoolsearch.models.WebProfessor
 
 import org.scalatra._
 import scalate.ScalateSupport
@@ -17,7 +19,7 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 case class ResultCounts(category: String, counts: Map[String, Int])
-case class Results(professors: Seq[Professor], counts: Seq[ResultCounts])
+case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts])
 
 class Gradsearch(val db: Database) extends GradsearchStack
   with JacksonJsonSupport with DbRoutes {
@@ -42,9 +44,49 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/search", "search" -> searchString)
   }
 
+  def getProfessors(searchString: String) = {
+    def matches(field: Column[String]) = field.toLowerCase.startsWith(searchString) ||
+      field.toLowerCase.endsWith(searchString)
+
+    // Professors whose keywords match the search string
+    val profKeywordJoin = for {
+      pk <- professorKeywords
+      k <- keywords if k.id === pk.keywordId && matches(k.keyword)
+      p <- professors if p.id === pk.profId
+    } yield p
+
+    // Professors whose name, school, or department match the search string
+    val profFilter = for {
+      p <- professors if matches(p.name) || matches(p.school) || matches(p.department)
+    } yield p
+
+    // All professors matching the search term
+    val professorQuery = (profKeywordJoin union profFilter)
+
+    // Get all research interests for those profs
+    val profKeywordQuery = for {
+      pk <- professorKeywords
+      k <- keywords if k.id === pk.keywordId
+      p <- professorQuery if p.id === pk.profId
+    } yield (p, k.keyword)
+
+    val profKeywords = profKeywordQuery.run
+
+    // Group by prof, then extract the keywords for each prof
+    val idMap = profKeywords.groupBy(_._1.id)
+
+    val results = idMap.map { case (id, stuffList) =>
+      val prof = stuffList.head._1
+      val words = stuffList.map(_._2)
+      new WebProfessor(prof, words)
+    }
+
+    results.toList
+  }
+
   get("/results") {
     db withDynSession {
-      // Iterate through all profs and output them
+      // Get search params
       val searchString = params("q").toLowerCase
       val schoolFilter = multiParams("University")
       val deptFilter = multiParams("Department")
@@ -52,24 +94,11 @@ class Gradsearch(val db: Database) extends GradsearchStack
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
       def deptFilterFunc(prof: Professor):Boolean = deptFilter.isEmpty || deptFilter.contains(prof.department)
 
-      def matches(field: Column[String]) = field.toLowerCase.startsWith(searchString) || field.toLowerCase.endsWith(searchString)
-
-      val profKeywordJoin = for {
-        pk <- professorKeywords
-        k <- keywords if k.id === pk.keywordId && matches(k.keyword)
-        p <- professors if p.id === pk.profId
-      } yield p
-
-      val profFilter = for {
-        p <- professors if matches(p.name) || matches(p.school) || matches(p.department)
-      } yield p
-
-      // All professors matching the search term
-      val professorResults = (profKeywordJoin union profFilter).run
+      // Get professors who match search string, plus their keywords
+      val professorResults = getProfessors(searchString)
 
       // Get counts for all possible filters
       type ProfFilter = Professor => Boolean
-
       def matchesFilters(prof: Professor, filters: Seq[ProfFilter]):Boolean = {
         filters.forall(filter => filter(prof))
       }
