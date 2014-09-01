@@ -15,7 +15,7 @@ object DataLoader {
   val dataFields = List("src/main/resources/data/yale.dat.json")
   implicit val formats = DefaultFormats
   def loadData() = {
-    println(new java.io.File(".").getAbsolutePath())
+    println(new java.io.File(".").getAbsolutePath() + "hello")
     dataFields.flatMap { fileName =>
       val file = Source.fromFile(fileName).mkString
       val json = parse(file)
