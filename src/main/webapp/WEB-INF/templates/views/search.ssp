@@ -6,6 +6,7 @@
 <div id="container"></div>
 
 <script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
+<script type="text/jsx" src="/js/gradsearch/modals.js"></script>
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(

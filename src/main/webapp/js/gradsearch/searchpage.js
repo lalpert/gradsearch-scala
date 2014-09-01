@@ -36,6 +36,9 @@ var SearchPage = React.createClass({
         "University": {},
         "Department": {}
       },
+      // Which prof is currently displayed in the modal.
+      // ID of the prof, or null when there is no modal displayed.
+      currentProfID: null,
     }
   },
 
@@ -73,18 +76,51 @@ var SearchPage = React.createClass({
      this.getProfs();
    },
 
+   showProfModal: function(profId) {
+     this.setState({currentProfID: profId})
+   },
+
+   findProf: function(profId) {
+     return _.findWhere(this.state.visibleProfs, {id: profId});
+   },
+
+   showNextProf: function(direction) {
+     var profIds = _.pluck(this.state.visibleProfs, "id");
+     var currentIndex = _.indexOf(profIds, this.state.currentProfID);
+
+     if (direction == "next") {
+       if (currentIndex < profIds.length - 1) {
+         this.setState({currentProfID: profIds[currentIndex + 1]})
+       }
+     } else {
+       if (currentIndex > 0) {
+         this.setState({currentProfID: profIds[currentIndex - 1]})
+       }
+     }
+   },
+
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     var numProfs = visibleProfs.length ? visibleProfs.length : "";
+    var currentProf = this.findProf(this.state.currentProfID);
+    console.log(currentProf);
     return (
-      <div className="searchpage">
-        {numProfs} Professors researching {this.props.searchString}
-        <ProfSection profArray={visibleProfs} />
-        <FilterBar
-           onChange={this.updateFilters}
-           filterOptions={this.state.filterOptions}
-           selectedFilters={this.state.selectedFilters}
-        />
+      <div>
+        <div className="modal-div">
+          <ModalDiv
+            currentProf={currentProf}
+            showNextProf={this.showNextProf}
+          />
+        </div>
+        <div className="search-page">
+          {numProfs} Professors researching {this.props.searchString}
+          <ProfSection profArray={visibleProfs} showModal={this.showProfModal}/>
+          <FilterBar
+             onChange={this.updateFilters}
+             filterOptions={this.state.filterOptions}
+             selectedFilters={this.state.selectedFilters}
+          />
+        </div>
       </div>
     );
   },
@@ -101,11 +137,13 @@ var SearchPage = React.createClass({
 var ProfSection = React.createClass({
   propTypes: {
     profArray: React.PropTypes.array,
+    showModal: React.PropTypes.func,
   },
 
   render: function() {
+    var showModal = this.props.showModal;
     allProfs = this.props.profArray.map(function(prof) {
-      return <ProfBox profData={prof} key={prof.id}/>;
+      return <ProfBox profData={prof} key={prof.id} showModal={showModal}/>;
     });
 
     return <div className="container-fluid">
@@ -119,7 +157,12 @@ var ProfSection = React.createClass({
  */
 var ProfBox = React.createClass({
   propTypes: {
-    profData: React.PropTypes.object
+    profData: React.PropTypes.object,
+    showModal: React.PropTypes.func,
+  },
+
+  handleClick: function() {
+    this.props.showModal(this.props.profData.id);
   },
 
   formatKeywords: function(keywords) {
@@ -135,17 +178,17 @@ var ProfBox = React.createClass({
     };
 
     return (
-    <div className="media">
-      <a className="pull-left" href="#">
+    <a href="#" onClick={this.handleClick} className="media">
+      <div className="pull-left">
         <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
-      </a>
+      </div>
       <div className="media-body">
         <h4 className="media-heading">{this.props.profData.name}</h4>
         <p>{prof.school}</p>
         <p>{prof.department}</p>
         <p>{this.formatKeywords(prof.keywords)}</p>
       </div>
-    </div>
+    </a>
 
     );
   }
