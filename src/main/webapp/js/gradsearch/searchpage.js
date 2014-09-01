@@ -77,7 +77,7 @@ var SearchPage = React.createClass({
     var visibleProfs = this.state.visibleProfs;
     var numProfs = visibleProfs.length ? visibleProfs.length : "";
     return (
-      <div className="searchpage">
+      <div className="container">
         {numProfs} Professors researching {this.props.searchString}
         <ProfSection profArray={visibleProfs} />
         <FilterBar
@@ -108,45 +108,70 @@ var ProfSection = React.createClass({
       return <ProfBox profData={prof} key={prof.id}/>;
     });
 
-    return <div className="container-fluid">
-       {allProfs}
-    </div>;
+    return <div className="row">
+                 {allProfs}
+            </div>;
   }
 });
 
-/**
- * Box with information for a single professor
- */
 var ProfBox = React.createClass({
   propTypes: {
     profData: React.PropTypes.object
   },
 
   formatKeywords: function(keywords) {
-    return keywords.join(", ");
+    return _.first(keywords, 3).join(", ");
   },
 
   render: function() {
     var prof = this.props.profData;
     var divStyle = {
-      border: '1px solid blue',
-      margin: '5px',
-      padding: '10px'
+      //width: 300,
+      height: 137,
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     };
+    var gridStyle = {
+      paddingLeft: 5,
+      paddingRight: 5
+    }
+
+    var thumbStyle = {
+        paddingRight: 10
+    }
+
+    var aboveFold = {
+         height: 100
+    }
+
+    var hrStyle = {
+        marginTop: 3,
+        marginBottom: 3
+    }
+
+    var belowFold = {
+        paddingLeft: 10
+    }
 
     return (
-    <div className="media">
-      <a className="pull-left" href="#">
-        <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
-      </a>
-      <div className="media-body">
-        <h4 className="media-heading">{this.props.profData.name}</h4>
-        <p>{prof.school}</p>
-        <p>{prof.department}</p>
-        <p>{this.formatKeywords(prof.keywords)}</p>
+      <div className="col-sm-6 col-md-4" style={gridStyle}>
+        <div className="thumbnail" style={divStyle}>
+          <div style={aboveFold}>
+              <a className="pull-left" href="#" style={thumbStyle}>
+                <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
+              </a>
+              <div>
+                <h4 className="media-heading">{this.props.profData.name}</h4>
+                <p>{prof.school}</p>
+                <p>{prof.department}</p>
+              </div>
+          </div>
+          <hr style={hrStyle}/>
+          <div style={belowFold}>
+            <p>{this.formatKeywords(prof.keywords)}</p>
+          </div>
+        </div>
       </div>
-    </div>
-
     );
   }
 });
