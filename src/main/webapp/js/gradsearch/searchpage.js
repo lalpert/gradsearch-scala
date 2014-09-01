@@ -28,17 +28,20 @@ var SearchPage = React.createClass({
       filterOptions: [],
       // Starts with no filters; users can add filter by clicking uni/dept checkboxes
       // selectedFilters will be look like:
-      // [
-      //   {"school": {"MIT": true, "Stanford": true}},
-      //   {"department": {"CS": true}}
-      // ]
-      selectedFilters: [],
+      // {
+      //   "University": {"MIT": true, "Stanford": true},
+      //   "Department": {"CS": true}
+      // }
+      selectedFilters: {
+        "University": {},
+        "Department": {}
+      },
     }
   },
 
   buildUrl: function() {
     var url = "/results?q=" + encodeURIComponent(this.props.searchString);
-    _.each(this.state.filterOptions, function(filterVals, filterName) {
+    _.each(this.state.selectedFilters, function(filterVals, filterName) {
       _.each(filterVals, function(checked, name) {
         if (checked) {
           url += "&" + filterName + "=" + encodeURIComponent(name);
@@ -53,7 +56,7 @@ var SearchPage = React.createClass({
     var url = this.buildUrl();
     var jqxhr = $.get(url, function(data) {
       self.setState({
-        visibleProfs: data.professors,
+        visibleProfs: data.rawData,
         filterOptions: data.counts
       });
     });
@@ -71,9 +74,8 @@ var SearchPage = React.createClass({
    },
 
   render: function() {
-    console.log("filters", this.state.filters);
     var visibleProfs = this.state.visibleProfs;
-    numProfs = visibleProfs.length ? visibleProfs.length : "";
+    var numProfs = visibleProfs.length ? visibleProfs.length : "";
     return (
       <div className="searchpage">
         {numProfs} Professors researching {this.props.searchString}
@@ -150,7 +152,16 @@ var FilterBar = React.createClass({
   propTypes: {
     onChange: React.PropTypes.func.isRequired,
     filterOptions: React.PropTypes.array.isRequired,
-    selectedFilters: React.PropTypes.array.isRequired
+    selectedFilters: React.PropTypes.object.isRequired
+  },
+
+  getChoices: function(category) {
+    var choices = _.findWhere(this.props.filterOptions, {"category": category});
+    if (choices) {
+      return choices.counts;
+    } else {
+       return {};
+    }
   },
 
   render: function() {
@@ -158,14 +169,14 @@ var FilterBar = React.createClass({
     return <div>
       <FilterSection
         title="University"
-        choices={_.findWhere(this.props.filterOptions, {"category": "University"}).counts}
-        selectedFilters={this.props.selectedFilters["school"]}
+        choices={this.getChoices("University")}
+        selectedFilters={this.props.selectedFilters["University"]}
         handleChange={this.props.onChange}
       />
       <FilterSection
         title="Department"
-        choices={_.findWhere(this.props.filterOptions, {"category": "Department"}).counts}
-        selectedFilters={this.props.selectedFilters["department"]}
+        choices={this.getChoices("Department")}
+        selectedFilters={this.props.selectedFilters["Department"]}
         handleChange={this.props.onChange}
       />
     </div>
@@ -177,23 +188,24 @@ var FilterSection = React.createClass({
   propTypes: {
     title: React.PropTypes.string.isRequired,
     // e.g. {"MIT": 3, "Stanford":2}
-    choices: React.PropTypes.object,
+    choices: React.PropTypes.object.isRequired,
     // e.g. {"MIT": true, "Stanford": false}
-    selectedFilters: React.PropTypes.object,
-    handleChange: React.PropTypes.func,
+    selectedFilters: React.PropTypes.object.isRequired,
+    handleChange: React.PropTypes.func.isRequired,
   },
 
   render: function() {
      var self = this;
      var title = this.props.title
      var options = _.map(this.props.choices, function(num, name) {
-        var checked = Boolean(this.props.selectedFilters[name]);
+        var checked = Boolean(self.props.selectedFilters[name]);
         return <FilterOption
-          name={title}
+          key={title + name}
+          title={title}
           checked={checked}
           value={name}
           num={num}
-          onClick={self.props.handleChange}
+          handleChange={self.props.handleChange}
         />
      });
 
@@ -208,24 +220,24 @@ var FilterSection = React.createClass({
 var FilterOption = React.createClass({
   propTypes: {
     title: React.PropTypes.string.isRequired,
-    name: React.PropTypes.string.isRequired,
-    num: React.PropTypes.number,
-    checked: React.PropTypes.bool,
-    handleChange: React.PropTypes.func,
+    value: React.PropTypes.string.isRequired,
+    num: React.PropTypes.number.isRequired,
+    checked: React.PropTypes.bool.isRequired,
+    handleChange: React.PropTypes.func.isRequired,
   },
 
   handleClick: function(event) {
-    this.props.handleChange(this.props.title, this.props.name, event.target.checked)
+    this.props.handleChange(this.props.title, this.props.value, event.target.checked)
   },
 
   render: function() {
     var title = this.props.title;
-    var name = this.props.name;
+    var value = this.props.value;
     var num = this.props.num;
     var checked = this.props.checked;
     return <label>
-      <input type="checkbox" name={title} value={name} checked={checked} onClick={this.handleClick}/>
-      {name} ({num})
+      <input type="checkbox" name={title} value={value} checked={checked} onChange={this.handleClick}/>
+      {value} ({num})
     </label>
   }
 });
