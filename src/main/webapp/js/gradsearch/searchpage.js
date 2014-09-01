@@ -56,7 +56,7 @@ var SearchPage = React.createClass({
     var url = this.buildUrl();
     var jqxhr = $.get(url, function(data) {
       self.setState({
-        visibleProfs: data.rawData,
+        visibleProfs: data.professors,
         filterOptions: data.counts
       });
     });
