@@ -23,9 +23,11 @@ trait DbRoutes extends ScalatraServlet {
       // Insert some professors
       professors.insertAll(
         Professor(Some(1), "Leah Alpert", "MIT", "CS"),
-        Professor(Some(2), "Russell Cohen", "MIT", "EECS"),
+        Professor(Some(2), "Russell Cohen", "MIT", "EE"),
         Professor(Some(3), "Fake person", "Stanford", "CS"),
-        Professor(Some(4), "Pretend person", "Stanford", "CS")
+        Professor(Some(4), "Pretend person", "Stanford", "CS"),
+        Professor(Some(4), "CS person", "MIT", "CS"),
+        Professor(Some(4), "EE person", "MIT", "EE")
       )
 
       if (!MTable.getTables("KEYWORDS").list.isEmpty) {
@@ -48,7 +50,11 @@ trait DbRoutes extends ScalatraServlet {
         (1, 2),
         (1, 4),
         (2, 2),
-        (3, 3)
+        (3, 3),
+        (3, 2),
+        (4, 2),
+        (5, 2),
+        (6, 2)
       )
     }
   }
