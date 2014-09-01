@@ -105,22 +105,23 @@ var SearchPage = React.createClass({
     var currentProf = this.findProf(this.state.currentProfID);
     console.log(currentProf);
     return (
-      <div>
+      <div className="container">
+
         <div className="modal-div">
           <ModalDiv
             currentProf={currentProf}
             showNextProf={this.showNextProf}
           />
         </div>
-        <div className="search-page">
-          {numProfs} Professors researching {this.props.searchString}
-          <ProfSection profArray={visibleProfs} showModal={this.showProfModal}/>
-          <FilterBar
-             onChange={this.updateFilters}
-             filterOptions={this.state.filterOptions}
-             selectedFilters={this.state.selectedFilters}
-          />
-        </div>
+
+        {numProfs} Professors researching {this.props.searchString}
+        <ProfSection profArray={visibleProfs} showModal={this.showProfModal}/>
+        <FilterBar
+           onChange={this.updateFilters}
+           filterOptions={this.state.filterOptions}
+           selectedFilters={this.state.selectedFilters}
+        />
+
       </div>
     );
   },
@@ -146,15 +147,12 @@ var ProfSection = React.createClass({
       return <ProfBox profData={prof} key={prof.id} showModal={showModal}/>;
     });
 
-    return <div className="container-fluid">
-       {allProfs}
-    </div>;
+    return <div className="row">
+                 {allProfs}
+            </div>;
   }
 });
 
-/**
- * Box with information for a single professor
- */
 var ProfBox = React.createClass({
   propTypes: {
     profData: React.PropTypes.object,
@@ -166,30 +164,58 @@ var ProfBox = React.createClass({
   },
 
   formatKeywords: function(keywords) {
-    return keywords.join(", ");
+    return _.first(keywords, 3).join(", ");
   },
 
   render: function() {
     var prof = this.props.profData;
     var divStyle = {
-      border: '1px solid blue',
-      margin: '5px',
-      padding: '10px'
+      //width: 300,
+      height: 137,
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     };
+    var gridStyle = {
+      paddingLeft: 5,
+      paddingRight: 5
+    }
+
+    var thumbStyle = {
+        paddingRight: 10
+    }
+
+    var aboveFold = {
+         height: 100
+    }
+
+    var hrStyle = {
+        marginTop: 3,
+        marginBottom: 3
+    }
+
+    var belowFold = {
+        paddingLeft: 10
+    }
 
     return (
-    <a href="#" onClick={this.handleClick} className="media">
-      <div className="pull-left">
-        <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
+      <div className="col-sm-6 col-md-4" style={gridStyle}>
+        <div className="thumbnail" style={divStyle} onClick={this.handleClick}>
+          <div style={aboveFold}>
+              <a className="pull-left" href="#" style={thumbStyle}>
+                <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
+              </a>
+              <div>
+                <h4 className="media-heading">{this.props.profData.name}</h4>
+                <p>{prof.school}</p>
+                <p>{prof.department}</p>
+              </div>
+          </div>
+          <hr style={hrStyle}/>
+          <div style={belowFold}>
+            <p>{this.formatKeywords(prof.keywords)}</p>
+          </div>
+        </div>
       </div>
-      <div className="media-body">
-        <h4 className="media-heading">{this.props.profData.name}</h4>
-        <p>{prof.school}</p>
-        <p>{prof.department}</p>
-        <p>{this.formatKeywords(prof.keywords)}</p>
-      </div>
-    </a>
-
     );
   }
 });
