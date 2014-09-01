@@ -1,11 +1,8 @@
 package org.gradschoolsearch.db
 
-<<<<<<< HEAD
 import org.gradschoolsearch.db.DataLoader.ProfWithKeywords
-import org.gradschoolsearch.models.Professor
-=======
 import org.gradschoolsearch.models.DBProfessor
->>>>>>> 91af8c2753e57e32278819bd5536ba4b9030191b
+
 import org.scalatra._
 
 import Tables._
@@ -37,9 +34,9 @@ trait DbRoutes extends ScalatraServlet {
   private def addFakeData(): Unit = {
     // Insert some professors
     val fakeProfs = List(
-      ProfWithKeywords(Professor(None, "Leah Alpert", "MIT", "CS"), List("robotics")),
-      ProfWithKeywords(Professor(None, "Russell Cohen", "MIT", "EE"), List("algorithms", "robotics")),
-      ProfWithKeywords(Professor(None, "Fake person", "Stanford", "CS"), List("computer vision"))
+      ProfWithKeywords(DBProfessor(None, "Leah Alpert", "MIT", "CS"), List("robotics")),
+      ProfWithKeywords(DBProfessor(None, "Russell Cohen", "MIT", "EE"), List("algorithms", "robotics")),
+      ProfWithKeywords(DBProfessor(None, "Fake person", "Stanford", "CS"), List("computer vision"))
     )
     fakeProfs.foreach(insertProfWithKeywords)
   }
