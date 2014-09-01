@@ -46,8 +46,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
     db withDynSession {
       // Iterate through all profs and output them
       val searchString = params("q").toLowerCase
-      val schoolFilter = multiParams("school")
-      val deptFilter = multiParams("department")
+      val schoolFilter = multiParams("University")
+      val deptFilter = multiParams("Department")
 
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
       def deptFilterFunc(prof: Professor):Boolean = deptFilter.isEmpty || deptFilter.contains(prof.department)
