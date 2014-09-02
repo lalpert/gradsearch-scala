@@ -132,6 +132,7 @@ var SearchPage = React.createClass({
 
   componentDidMount: function() {
     // Get the search results
+    $("#navbar-search-box").val(this.props.searchString);
     this.getProfs();
   },
  });
@@ -152,8 +153,8 @@ var ProfSection = React.createClass({
     });
 
     return <div className="row">
-                 {allProfs}
-            </div>;
+      {allProfs}
+    </div>;
   }
 });
 

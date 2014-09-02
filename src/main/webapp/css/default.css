@@ -1,0 +1,12 @@
+.nav-blue {
+  background-color: #54b4eb;
+}
+
+.navbar-default.nav-blue .active > a {
+  background-color: #2885C4;
+
+}
+
+.main-nav {
+  margin-bottom: 0px;
+}

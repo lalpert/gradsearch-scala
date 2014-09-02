@@ -11,7 +11,6 @@ var ModalDiv = React.createClass({
   },
 
   componentDidUpdate: function(prevProps) {
-
     var self = this;
     if (this.props.currentProf != null) {
       $('#profModal').modal('show')

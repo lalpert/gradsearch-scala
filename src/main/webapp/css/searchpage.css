@@ -59,3 +59,27 @@ footer {
     width: 50%; /* 6 columns */
   }
 }
+
+/* Failed attempt at animation
+.profs-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.profs-enter.profs-enter-active {
+  opacity: 1;
+}
+
+.profs-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.profs-leave.profs-leave-active {
+  opacity: 0.01;
+}
+*/
+
+.header-searchbar {
+  margin: 9px 17px 0px 0px;
+}
