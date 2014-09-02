@@ -3,13 +3,40 @@
 
 <%@ val search: String %>
 
-<div id="container"></div>
+<!-- Maybe move this to react -->
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+  <div class="container">
 
-<script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
+    <div class="navbar-header">
+      <div>
+        <form action="/search" method="get" class="form-inline header-searchbar" role="form">
+          <div class="form-group">
+            <input type="text" name="q" class="form-control" id="navbar-search-box">
+          </div>
+          <button type="submit" class="btn btn-default">Go</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Starred searches</a></li>
+        <li><a href="#">Starred professors</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+
+  </div>
+</div>
+
+<div id="container"></div>
 
 <link href="/css/searchpage.css" rel="stylesheet">
 
+<script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
 <script type="text/jsx" src="/js/gradsearch/modals.js"></script>
+<script type="text/jsx" src="/js/gradsearch/filters.js"></script>
+<script type="text/jsx" src="/js/gradsearch/professors.js"></script>
+
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(

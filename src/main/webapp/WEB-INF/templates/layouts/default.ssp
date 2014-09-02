@@ -13,11 +13,12 @@
   <script src="/js/bootstrap/bootstrap.js"></script>
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
+  <link href="/css/default.css" rel="stylesheet">
 </head>
 
 <body>
       <!-- Static navbar -->
-      <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="navbar navbar-inverse navbar-static-top main-nav" role="navigation">
         <div class="container">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
@@ -36,6 +37,7 @@
           </div><!--/.nav-collapse -->
         </div>
       </div>
+
   ${unescape(body)}
 <div class="footer">
   <div class="footer-container">
