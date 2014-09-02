@@ -11,7 +11,7 @@ object Tables {
   def fullTextMatch[T](term: String, columns: String*): Column[Boolean] = {
     val column = columns mkString ","
     SimpleExpression.nullary[Boolean] { (qb) =>
-      qb.sqlBuilder += f"match($column) against ('$term* in boolean mode')"
+      qb.sqlBuilder += f"match($column) against ('$term*' in boolean mode)"
     }
   }
 
