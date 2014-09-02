@@ -73,7 +73,7 @@ trait DbRoutes extends ScalatraServlet {
       dropAndCreateDb()
       addFakeData()
       addRealData()
-      "Sucess!"
+      <h1>Total professors: {professors.size.run}</h1>
     }
   }
 }
