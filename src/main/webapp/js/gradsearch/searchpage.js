@@ -33,6 +33,7 @@ var SearchPage = React.createClass({
       //   "Department": {"CS": true}
       // }
       selectedFilters: {
+        "Starred": {},
         "University": {},
         "Department": {}
       },
@@ -68,46 +69,87 @@ var SearchPage = React.createClass({
   /**
    * Add or remove a filter
    */
-   updateFilters: function(title, name, checked) {
-     var newFilters = this.state.selectedFilters
-     newFilters[title][name] = checked;
-     this.setState({selectedFilters: newFilters});
-     // Get the professors matching the new filters
-     this.getProfs();
-   },
+  updateFilters: function(title, name, checked) {
+    var newFilters = this.state.selectedFilters
+    newFilters[title][name] = checked;
+    this.setState({selectedFilters: newFilters});
+    // Get the professors matching the new filters
+    this.getProfs();
+  },
 
-   showProfModal: function(profId) {
-     this.setState({currentProfID: profId})
-   },
+  showProfModal: function(profId) {
+    this.setState({currentProfID: profId})
+  },
 
-   hideModal: function() {
-     this.setState({currentProfID: null})
-   },
+  hideModal: function() {
+    this.setState({currentProfID: null})
+  },
 
-   findProf: function(profId) {
-     return _.findWhere(this.state.visibleProfs, {id: profId});
-   },
+  findProf: function(profId) {
+    return _.findWhere(this.state.visibleProfs, {id: profId});
+  },
 
-   showNextProf: function(direction) {
-     var profIds = _.pluck(this.state.visibleProfs, "id");
-     var currentIndex = _.indexOf(profIds, this.state.currentProfID);
+  showNextProf: function(direction) {
+    var profIds = _.pluck(this.state.visibleProfs, "id");
+    var currentIndex = _.indexOf(profIds, this.state.currentProfID);
 
-     if (direction == "next") {
-       if (currentIndex < profIds.length - 1) {
-         this.setState({currentProfID: profIds[currentIndex + 1]})
-       }
-     } else {
-       if (currentIndex > 0) {
-         this.setState({currentProfID: profIds[currentIndex - 1]})
-       }
-     }
-   },
+    if (direction == "next") {
+      if (currentIndex < profIds.length - 1) {
+        this.setState({currentProfID: profIds[currentIndex + 1]})
+      }
+    } else {
+      if (currentIndex > 0) {
+        this.setState({currentProfID: profIds[currentIndex - 1]})
+      }
+    }
+  },
+
+  stringFromFilterList: function(filterName, filterNamePlural, introString) {
+    var filter = this.state.selectedFilters[filterName];
+    var options = _.filter(_.keys(filter), function(opt) {
+       return filter[opt];
+    });
+
+    if (options.length === 0) {
+      return "";
+    } else if (options.length === 1) {
+      return " " + introString + " " + options[0];
+    } else {
+      return " " + introString + " " + options.length + " " + filterNamePlural;
+    }
+  },
+
+  // Turn search string + filters into a string
+  getSearchString: function() {
+    var visibleProfs = this.state.visibleProfs;
+    var numProfs = visibleProfs.length ? visibleProfs.length : "";
+    var starredString = this.state.selectedFilters["Starred"]["Starred"] ? " starred" : "";
+    var uniString = this.stringFromFilterList("University", "universities", "at");
+    var deptString = this.stringFromFilterList("Department", "departments", "in");
+    return numProfs + starredString + " professors researching " + this.props.searchString +
+      uniString + deptString;
+  },
+
+  setStarred: function(profId, starred) {
+    var prof = this.findProf(profId);
+    prof.starred = starred;
+    this.setState({visibleProfs: this.state.visibleProfs});
+    // TODO: Ajax call to set state on server
+  },
+
+  setSearchStarred: function(starred) {
+
+    prof.starred = starred;
+    this.setState({visibleProfs: this.state.visibleProfs});
+    // TODO: Ajax call to set state on server
+  },
 
   render: function() {
     var visibleProfs = this.state.visibleProfs;
-    var numProfs = visibleProfs.length ? visibleProfs.length : "";
     var currentProf = this.findProf(this.state.currentProfID);
-    console.log(currentProf);
+    var numStarred = _.where(visibleProfs, {starred: true}).length;
+    var starImg = "gray_star.png"; //this.props.search.starred ? "gold_star.png" : "gray_star.png";
+
     return (
       <div className="search-container">
 
@@ -119,13 +161,29 @@ var SearchPage = React.createClass({
           />
         </div>
 
-        {numProfs} Professors researching {this.props.searchString}
-        <FilterBar
-              onChange={this.updateFilters}
-              filterOptions={this.state.filterOptions}
-              selectedFilters={this.state.selectedFilters}
-           />
-        <ProfSection profArray={visibleProfs} showModal={this.showProfModal}/>
+        <div className="col-sm-3">
+          <FilterBar
+            onChange={this.updateFilters}
+            filterOptions={this.state.filterOptions}
+            selectedFilters={this.state.selectedFilters}
+            numStarred={numStarred}
+          />
+        </div>
+
+        <div className="col-sm-9">
+          <div className="alert alert-info search-string-div" role="alert">
+            {this.getSearchString()}
+            <div className="search-star-div" onClick={this.setSearchStarred}>
+              <img src={"/images/" + starImg} height="25px"/>
+            </div>
+          </div>
+
+          <ProfSection
+            profArray={visibleProfs}
+            showModal={this.showProfModal}
+            setStarred={this.setStarred}
+          />
+        </div>
       </div>
     );
   },
@@ -144,12 +202,18 @@ var ProfSection = React.createClass({
   propTypes: {
     profArray: React.PropTypes.array,
     showModal: React.PropTypes.func,
+    setStarred: React.PropTypes.func,
   },
 
   render: function() {
-    var showModal = this.props.showModal;
+    var props = this.props;
     allProfs = this.props.profArray.map(function(prof) {
-      return <ProfBox profData={prof} key={prof.id} showModal={showModal}/>;
+      return <ProfBox
+        profData={prof}
+        key={prof.id}
+        showModal={props.showModal}
+        setStarred={props.setStarred}
+      />;
     });
 
     return <div className="row">
@@ -160,12 +224,18 @@ var ProfSection = React.createClass({
 
 var ProfBox = React.createClass({
   propTypes: {
-    profData: React.PropTypes.object,
-    showModal: React.PropTypes.func,
+    profData: React.PropTypes.object.isRequired,
+    showModal: React.PropTypes.func.isRequired,
+    setStarred: React.PropTypes.func.isRequired,
   },
 
   handleClick: function() {
     this.props.showModal(this.props.profData.id);
+  },
+
+  setStarred: function(event) {
+    event.stopPropagation();
+    this.props.setStarred(this.props.profData.id, !this.props.profData.starred)
   },
 
   formatKeywords: function(keywords) {
@@ -202,13 +272,19 @@ var ProfBox = React.createClass({
         paddingLeft: 10
     }
 
+    var starImg = this.props.profData.starred ? "gold_star.png" : "gray_star.png";
+
     return (
-      <div className="col-sm-6 col-md-4" style={gridStyle}>
+      <div className="col-sm-6 col-lg-4" style={gridStyle}>
         <div className="thumbnail" style={divStyle} onClick={this.handleClick}>
+          <a className="pull-left" href="#" style={thumbStyle}>
+            <img className="media-object" src="http://placehold.it/100x125" alt="Generic placeholder image"/>
+          </a>
+          <div className="star-div" onClick={this.setStarred}>
+            <img src={"/images/" + starImg} height="20px"/>
+          </div>
           <div style={aboveFold}>
-              <a className="pull-left" href="#" style={thumbStyle}>
-                <img className="media-object" src="http://placehold.it/100x100" alt="Generic placeholder image"/>
-              </a>
+
               <div>
                 <h4 className="media-heading">{this.props.profData.name}</h4>
                 <p>{prof.school}</p>
@@ -229,7 +305,8 @@ var FilterBar = React.createClass({
   propTypes: {
     onChange: React.PropTypes.func.isRequired,
     filterOptions: React.PropTypes.array.isRequired,
-    selectedFilters: React.PropTypes.object.isRequired
+    selectedFilters: React.PropTypes.object.isRequired,
+    numStarred: React.PropTypes.number.isRequired
   },
 
   getChoices: function(category) {
@@ -242,11 +319,16 @@ var FilterBar = React.createClass({
   },
 
   render: function() {
-    var checked = this.props.checked;
-    var filterStyle = {
-        height: "100%"
-    }
-    return <div className="col-xs-6 col-sm-3 sidebar-offcanvas" style={filterStyle} id="sidebar" role="navigation">
+    var starred = {"Starred": this.props.numStarred}
+
+    return <div id="sidebar">
+      <h4>Filter results by:</h4>
+     <FilterSection
+        title="Starred"
+        choices={starred}
+        selectedFilters={this.props.selectedFilters["Starred"]}
+        handleChange={this.props.onChange}
+      />
       <FilterSection
         title="University"
         choices={this.getChoices("University")}
