@@ -43,6 +43,10 @@ footer {
   margin-right: -10px;
 }
 
+.filter-header {
+  display: inline-block;
+  margin-right: 8px;
+}
 
  /*
   * Off Canvas

@@ -40,6 +40,8 @@ var SearchPage = React.createClass({
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
+      // List of searches the user has starred before
+
     }
   },
 
@@ -72,6 +74,14 @@ var SearchPage = React.createClass({
   updateFilters: function(title, name, checked) {
     var newFilters = this.state.selectedFilters
     newFilters[title][name] = checked;
+    this.setState({selectedFilters: newFilters});
+    // Get the professors matching the new filters
+    this.getProfs();
+  },
+
+  clearSection: function(title) {
+    var newFilters = this.state.selectedFilters
+    newFilters[title] = {};
     this.setState({selectedFilters: newFilters});
     // Get the professors matching the new filters
     this.getProfs();
@@ -138,9 +148,6 @@ var SearchPage = React.createClass({
   },
 
   setSearchStarred: function(starred) {
-
-    prof.starred = starred;
-    this.setState({visibleProfs: this.state.visibleProfs});
     // TODO: Ajax call to set state on server
   },
 
@@ -164,6 +171,7 @@ var SearchPage = React.createClass({
         <div className="col-sm-3">
           <FilterBar
             onChange={this.updateFilters}
+            clearSection={this.clearSection}
             filterOptions={this.state.filterOptions}
             selectedFilters={this.state.selectedFilters}
             numStarred={numStarred}

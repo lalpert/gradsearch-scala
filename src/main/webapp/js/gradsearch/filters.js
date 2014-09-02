@@ -6,6 +6,7 @@
 var FilterBar = React.createClass({
   propTypes: {
     onChange: React.PropTypes.func.isRequired,
+    clearSection: React.PropTypes.func.isRequired,
     filterOptions: React.PropTypes.array.isRequired,
     selectedFilters: React.PropTypes.object.isRequired,
     numStarred: React.PropTypes.number.isRequired
@@ -30,18 +31,21 @@ var FilterBar = React.createClass({
         choices={starred}
         selectedFilters={this.props.selectedFilters["Starred"]}
         handleChange={this.props.onChange}
+        clearAll={this.props.clearSection}
       />
       <FilterSection
         title="University"
         choices={this.getChoices("University")}
         selectedFilters={this.props.selectedFilters["University"]}
         handleChange={this.props.onChange}
+        clearAll={this.props.clearSection}
       />
       <FilterSection
         title="Department"
         choices={this.getChoices("Department")}
         selectedFilters={this.props.selectedFilters["Department"]}
         handleChange={this.props.onChange}
+        clearAll={this.props.clearSection}
       />
     </div>
   }
@@ -56,12 +60,26 @@ var FilterSection = React.createClass({
     // e.g. {"MIT": true, "Stanford": false}
     selectedFilters: React.PropTypes.object.isRequired,
     handleChange: React.PropTypes.func.isRequired,
+    clearAll: React.PropTypes.func.isRequired,
+  },
+
+  clearAll: function(event) {
+    event.preventDefault();
+    this.props.clearAll(this.props.title);
   },
 
   render: function() {
      var self = this;
      var title = this.props.title
-     var options = _.map(this.props.choices, function(num, name) {
+     // choices is an array like [["CS", 3], ["EE", 1]]
+     var choices = _.pairs(this.props.choices);
+     var sortedChoices = _.sortBy(choices, function(choice) {
+       return -1 * choice[1]; // Highest count to lowest
+     });
+
+     var options = _.map(sortedChoices, function(arr) {
+        var name = arr[0];
+        var num = arr[1];
         var checked = Boolean(self.props.selectedFilters[name]);
         return <FilterOption
           key={title + name}
@@ -74,7 +92,11 @@ var FilterSection = React.createClass({
      });
 
      return <div>
-        <h4>{title}</h4>
+        <span>
+          <h4 className="filter-header">{title}</h4>
+          <a href="#" className="clear-all" onClick={this.clearAll}>Clear all</a>
+        </span>
+
         {options}
      </div>
   }
