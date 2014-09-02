@@ -1,6 +1,7 @@
 package org.gradschoolsearch.db
 
 import org.gradschoolsearch.models.DBProfessor
+import org.gradschoolsearch.models.User
 
 import scala.slick.ast.Library.SqlOperator
 import scala.slick.driver.MySQLDriver.simple._
@@ -44,4 +45,29 @@ object Tables {
     def * = (profId, keywordId)
   }
   val professorKeywords = TableQuery[ProfessorKeywords]
+
+  // User data
+  class Users(tag: Tag) extends Table[User](tag, "USERS") {
+    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+    def email = column[String]("EMAIL")
+    def hashedPassword = column[String]("HASHED_PASSWORD")
+    def * = (id.?, email, hashedPassword) <> (User.tupled, User.unapply)
+  }
+  val users = TableQuery[Users]
+
+  class StarredProfs(tag:Tag) extends Table[(Int, Int)](tag, "STARRED_PROFS") {
+    def userId = column[Int]("USER_ID")
+    def profId = column[Int]("PROF_ID")
+    def * = (userId, profId)
+  }
+  val starredProfessors = TableQuery[StarredProfs]
+
+
+  class StarredSearches(tag:Tag) extends Table[(Int, String)](tag, "STARRED_SEARCHES") {
+    def userId = column[Int]("USER_ID")
+    def searchString = column[String]("SEARCH_STRING")
+    def * = (userId, searchString)
+  }
+  val starredSearches = TableQuery[StarredSearches]
+
 }
