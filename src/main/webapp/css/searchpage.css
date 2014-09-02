@@ -28,11 +28,14 @@ footer {
   height: 20px;
  }
 
-.search-star-div {
-  float: right;
-  height: 25px;
+.search-star {
   position: relative;
   top: -3px;
+  margin-left: 7px;
+}
+
+.search-text-div {
+  float:right;
 }
 
 .search-string-div {
