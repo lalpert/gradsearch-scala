@@ -49,55 +49,26 @@ var ProfBox = React.createClass({
 
   render: function() {
     var prof = this.props.profData;
-    var divStyle = {
-      //width: 300,
-      height: 137,
-      overflow: "hidden",
-      textOverflow: "ellipsis"
-    };
-    var gridStyle = {
-      paddingLeft: 5,
-      paddingRight: 5
-    }
-
-    var thumbStyle = {
-        paddingRight: 10
-    }
-
-    var aboveFold = {
-         height: 100
-    }
-
-    var hrStyle = {
-        marginTop: 3,
-        marginBottom: 3
-    }
-
-    var belowFold = {
-        paddingLeft: 10
-    }
-
     var starImg = this.props.profData.starred ? "gold_star.png" : "gray_star.png";
 
     return (
-      <div className="col-sm-6 col-lg-4" style={gridStyle}>
-        <div className="thumbnail" style={divStyle} onClick={this.handleClick}>
-          <a className="pull-left" href="#" style={thumbStyle}>
+      <div className="col-sm-6 col-lg-4 grid-spacing">
+        <div className="thumbnail prof-div" onClick={this.handleClick}>
+          <a className="pull-left prof-pic" href="#">
             <img className="media-object" src="http://placehold.it/100x125" alt="Generic placeholder image"/>
           </a>
           <div className="star-div" onClick={this.setStarred}>
             <img src={"/images/" + starImg} height="20px"/>
           </div>
-          <div style={aboveFold}>
-
+          <div className="prof-info">
               <div>
                 <h4 className="media-heading">{this.props.profData.name}</h4>
                 <p>{prof.school}</p>
                 <p>{prof.department}</p>
               </div>
           </div>
-          <hr style={hrStyle}/>
-          <div style={belowFold}>
+          <hr className="prof-hr"/>
+          <div className="prof-keywords">
             <p>{this.formatKeywords(prof.keywords)}</p>
           </div>
         </div>
