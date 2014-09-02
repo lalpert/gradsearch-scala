@@ -6,7 +6,7 @@ import org.gradschoolsearch.models.DBProfessor
 import org.scalatra._
 
 import Tables._
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.jdbc.meta.MTable
 
@@ -15,6 +15,7 @@ trait DbRoutes extends ScalatraServlet {
   val db: Database
 
   private def dropAndCreateDb(): Unit = {
+
     if (!MTable.getTables("PROFESSORS").list.isEmpty) {
       professors.ddl.drop
     }
@@ -67,6 +68,7 @@ trait DbRoutes extends ScalatraServlet {
   }
 
   get("/db/create-data") {
+
     db withDynSession {
       dropAndCreateDb()
       addFakeData()

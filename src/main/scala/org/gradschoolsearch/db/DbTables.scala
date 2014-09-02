@@ -2,7 +2,7 @@ package org.gradschoolsearch.db
 
 import org.gradschoolsearch.models.DBProfessor
 
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 
 
 
