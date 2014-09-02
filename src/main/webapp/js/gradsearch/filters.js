@@ -53,6 +53,9 @@ var FilterBar = React.createClass({
 
 //Filter section, such as University or Department
 var FilterSection = React.createClass({
+
+  DEFAULT_OPTIONS_SHOWN: 10,
+
   propTypes: {
     title: React.PropTypes.string.isRequired,
     // e.g. {"MIT": 3, "Stanford":2}
@@ -63,9 +66,23 @@ var FilterSection = React.createClass({
     clearAll: React.PropTypes.func.isRequired,
   },
 
+  getInitialState: function() {
+    return {showAllOptions: false};
+  },
+
   clearAll: function(event) {
     event.preventDefault();
     this.props.clearAll(this.props.title);
+  },
+
+  showAll: function(event) {
+    event.preventDefault();
+    this.setState({showAllOptions: true});
+  },
+
+  showLess: function(event) {
+    event.preventDefault();
+    this.setState({showAllOptions: false});
   },
 
   render: function() {
@@ -73,16 +90,31 @@ var FilterSection = React.createClass({
      var title = this.props.title
      // choices is an array like [["CS", 3], ["EE", 1]]
      var choices = _.pairs(this.props.choices);
-     var sortedChoices = _.sortBy(choices, function(choice) {
+     var allSortedChoices = _.sortBy(choices, function(choice) {
        return -1 * choice[1]; // Highest count to lowest
      });
 
+     if (!this.state.showAllOptions) {
+       sortedChoices = allSortedChoices.slice(0, this.DEFAULT_OPTIONS_SHOWN);
+     } else {
+       sortedChoices = allSortedChoices
+     }
+
+     var showLink = "";
+     if (sortedChoices.length < allSortedChoices.length) {
+       showLink = <a href="#" onClick={this.showAll}>Show more</a>;
+     } else if (sortedChoices.length > this.DEFAULT_OPTIONS_SHOWN) {
+       showLink = <a href="#" onClick={this.showLess}>Show less</a>;
+     }
+
+     var temp = 0
      var options = _.map(sortedChoices, function(arr) {
+        temp++;
         var name = arr[0];
         var num = arr[1];
         var checked = Boolean(self.props.selectedFilters[name]);
         return <FilterOption
-          key={title + name}
+          key={title + name + temp}
           title={title}
           checked={checked}
           value={name}
@@ -96,8 +128,8 @@ var FilterSection = React.createClass({
           <h4 className="filter-header">{title}</h4>
           <a href="#" className="clear-all" onClick={this.clearAll}>Clear all</a>
         </span>
-
         {options}
+        {showLink}
      </div>
   }
 });
