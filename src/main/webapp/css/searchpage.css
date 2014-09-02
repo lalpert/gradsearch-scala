@@ -48,6 +48,35 @@ footer {
   margin-right: 8px;
 }
 
+.grid-spacing {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.prof-div {
+  height: 137px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prof-pic {
+  padding-right: 10px;
+}
+
+.prof-info {
+ height: 100px;
+}
+
+.prof-hr {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.prof-keywords {
+  padding-left: 10px;
+>>>>>>> 6ca34572d7b14722d84a98a5a77d54b80f93e63c
+}
+
  /*
   * Off Canvas
   * --------------------------------------------------

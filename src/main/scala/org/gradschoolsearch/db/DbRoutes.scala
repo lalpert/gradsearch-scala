@@ -6,24 +6,35 @@ import org.gradschoolsearch.models.DBProfessor
 import org.scalatra._
 
 import Tables._
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.jdbc.meta.MTable
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
+import org.json4s.JsonDSL._
 
+case class OptFoo(foo: String, bar: Option[String])
+import scala.slick.jdbc.{GetResult, StaticQuery => Q}
 trait DbRoutes extends ScalatraServlet {
 
   val db: Database
 
   private def dropAndCreateDb(): Unit = {
+
     if (!MTable.getTables("PROFESSORS").list.isEmpty) {
       professors.ddl.drop
     }
     professors.ddl.create
 
+    Q.updateNA("ALTER TABLE PROFESSORS ENGINE = MYISAM;").execute
+    Q.updateNA("CREATE FULLTEXT INDEX prof_name on PROFESSORS (name, department, school);").execute
+
     if (!MTable.getTables("KEYWORDS").list.isEmpty) {
       keywords.ddl.drop
     }
     keywords.ddl.create
+    Q.updateNA("ALTER TABLE KEYWORDS ENGINE = MYISAM;").execute
+    Q.updateNA("CREATE FULLTEXT INDEX keyword_ft on KEYWORDS (keyword);").execute
 
     if (!MTable.getTables("PROFESSOR_KEYWORDS").list.isEmpty) {
       professorKeywords.ddl.drop
@@ -63,15 +74,24 @@ trait DbRoutes extends ScalatraServlet {
 
   private def addRealData(): Unit = {
     val data = DataLoader.loadData()
-    data.foreach(insertProfWithKeywords)
+    data.grouped(100).foreach { list =>
+      println("100")
+      list.foreach(insertProfWithKeywords)
+    }
   }
 
   get("/db/create-data") {
+
     db withDynSession {
       dropAndCreateDb()
       addFakeData()
       addRealData()
-      "Sucess!"
+      <h1>Total professors: {professors.size.run}</h1>
     }
+  }
+
+  get("/db/test") {
+    implicit val formats = DefaultFormats
+    parse("{\"foo\": \"hey\", \"bar\": \"bey\", \"wat\": 5}").extract[OptFoo]
   }
 }

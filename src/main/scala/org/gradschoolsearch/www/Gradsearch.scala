@@ -15,7 +15,7 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 case class ResultCounts(category: String, counts: Map[String, Int])
@@ -45,20 +45,17 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   def getProfessors(searchString: String) = {
-    def matches(field: Column[String]) = field.toLowerCase.startsWith(searchString) ||
-      field.toLowerCase.endsWith(searchString)
 
     // Professors whose keywords match the search string
     val profKeywordJoin = for {
       pk <- professorKeywords
-      k <- keywords if k.id === pk.keywordId && matches(k.keyword)
+      k <- keywords if k.id === pk.keywordId && fullTextMatch(searchString, "keyword")
       p <- professors if p.id === pk.profId
     } yield p
 
     // Professors whose name, school, or department match the search string
-    val profFilter = for {
-      p <- professors if matches(p.name) || matches(p.school) || matches(p.department)
-    } yield p
+    val profFilter = professors.filter(prof => fullTextMatch(searchString, "name", "department", "school"))
+
 
     // All professors matching the search term
     val professorQuery = (profKeywordJoin union profFilter)
@@ -71,7 +68,6 @@ class Gradsearch(val db: Database) extends GradsearchStack
     } yield (p, k.keyword)
 
     val profKeywords = profKeywordQuery.run
-
     // Group by prof, then extract the keywords for each prof
     val idMap = profKeywords.groupBy(_._1.id)
 
