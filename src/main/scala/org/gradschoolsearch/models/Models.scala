@@ -1,4 +1,5 @@
 package org.gradschoolsearch.models
+
 import org.mindrot.jbcrypt.BCrypt;
 
 trait Professor {
@@ -16,10 +17,10 @@ case class WebProfessor(id:Option[Int], name:String, school:String, department:S
   }
 }
 
-case class User(id: Option[Int], email:String, passwordHash:String) {
+case class User(id:Option[Int], email:String, passwordHash:String)
+
+object User {
   def createUser(email:String, password:String) = {
     User(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
   }
-
-
 }

@@ -7,6 +7,7 @@ package org.gradschoolsearch.db
 import org.gradschoolsearch.models.DBProfessor
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+
 import scala.io.Source
 object DataLoader {
   case class ProfWithKeywords(professor: DBProfessor, keywords: List[String])

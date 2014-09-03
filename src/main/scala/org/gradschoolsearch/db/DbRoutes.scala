@@ -1,22 +1,18 @@
 package org.gradschoolsearch.db
 
 import org.gradschoolsearch.db.DataLoader.ProfWithKeywords
-import org.gradschoolsearch.models.DBProfessor
-import org.gradschoolsearch.models.User
-import org.mindrot.jbcrypt.BCrypt
-
+import org.gradschoolsearch.db.Tables._
+import org.gradschoolsearch.models.{DBProfessor, User}
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 import org.scalatra._
 
-import Tables._
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.jdbc.meta.MTable
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-import org.json4s.JsonDSL._
 
 case class OptFoo(foo: String, bar: Option[String])
-import scala.slick.jdbc.{GetResult, StaticQuery => Q}
+import scala.slick.jdbc.{StaticQuery => Q}
 trait DbRoutes extends ScalatraServlet {
 
   val db: Database
@@ -92,19 +88,17 @@ trait DbRoutes extends ScalatraServlet {
     }
   }
 
-  def createUser(email:String, password:String) = {
-    User(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
-  }
-
   get("/db/create-user") {
     db withDynSession {
 
       // Create Users table if none exists
-      if (MTable.getTables("USERS").list.isEmpty) {
-        users.ddl.create
+      if (!MTable.getTables("USERS").list.isEmpty) {
+        users.ddl.drop
       }
+      users.ddl.create
 
-      users insert createUser("Russell User", "pwdHash")
+
+      users insert User.createUser("Russell User", "pwdHash")
       <h1>Total Users: {users.size.run}</h1>
     }
   }

@@ -1,16 +1,9 @@
 package org.gradschoolsearch.www
 
+import org.gradschoolsearch.db.Tables._
 import org.gradschoolsearch.db.{DbRoutes, Tables}
-import Tables._
-import org.gradschoolsearch.models.Professor
-import org.gradschoolsearch.models.DBProfessor
-import org.gradschoolsearch.models.WebProfessor
+import org.gradschoolsearch.models.{Professor, WebProfessor}
 import org.gradschoolsearch.www.Auth.AuthenticationSupport
-
-import org.scalatra._
-import scalate.ScalateSupport
-
-import org.scalatra.auth._
 
 // JSON-related libraries
 import org.json4s.{DefaultFormats, Formats}

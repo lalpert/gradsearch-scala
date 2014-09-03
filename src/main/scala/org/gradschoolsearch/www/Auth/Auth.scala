@@ -1,45 +1,59 @@
 package org.gradschoolsearch.www.Auth
 
-import org.scalatra._
-import scalate.ScalateSupport
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
+import org.gradschoolsearch.db.Tables._
+import org.gradschoolsearch.models.User
+import org.mindrot.jbcrypt.BCrypt
+import org.scalatra.ScalatraBase
 import org.scalatra.auth.strategy.{BasicAuthStrategy, BasicAuthSupport}
-import org.scalatra.auth.{ScentrySupport, ScentryConfig}
-import org.scalatra.{ScalatraBase}
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
-import org.mindrot.jbcrypt.BCrypt;
+import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 
-// Simple user class for testing
-case class User2(id: String)
+import scala.slick.driver.MySQLDriver.simple._
+import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 
-class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String)
-  extends BasicAuthStrategy[User2](app, realm) {
+class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String, db:Database)
+  extends BasicAuthStrategy[User](app, realm) {
 
-  // Required method that returns a matching user or None
-  protected def validate(userName: String, password: String)(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User2] = {
-    if(userName == "scalatra" && password == "scalatra") Some(User2("scalatra"))
-    //val correctPwd = BCrypt.checkpw(password, u.passwordHash)
-
-    else None
+  // Why do we need this?
+  protected def getUserId(user: User)
+                         (implicit request: HttpServletRequest, response: HttpServletResponse): String = {
+    user.id.toString
   }
 
-  protected def getUserId(user: User2)(implicit request: HttpServletRequest, response: HttpServletResponse): String = user.id
+  // Required method that returns a matching user or None
+  protected def validate(email: String, password: String)
+                        (implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
+    db withDynSession {
+      val userOpt = users.filter(_.email === email).firstOption
+      userOpt match {
+        case None => None
+        case Some(user) => if (BCrypt.checkpw(password, user.passwordHash)) Some(user) else None
+      }
+    }
+  }
 }
 
 
-trait AuthenticationSupport extends ScentrySupport[User2] with BasicAuthSupport[User2] {
+trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[User] {
   self: ScalatraBase =>
+
+  val db:Database
 
   // What are these vars?
   val realm = "Scalatra Basic Auth Example"
   protected val scentryConfig = (new ScentryConfig {}).asInstanceOf[ScentryConfiguration]
 
   // Session string -> User object
-  protected def fromSession = { case id: String => User2(id)  }
+  protected def fromSession = { case id: String =>
+    db withDynSession {
+      users.filter(_.id === id.toInt).firstOption.get
+    }
+  }
 
   // User object -> session string
-  protected def toSession   = { case usr: User2 => usr.id }
+  protected def toSession   = { case usr: User => usr.id.toString }
 
   // Registers our Auth strategy with Scentry
   override protected def configureScentry = {
@@ -49,7 +63,7 @@ trait AuthenticationSupport extends ScentrySupport[User2] with BasicAuthSupport[
   }
 
   override protected def registerAuthStrategies = {
-    scentry.register("Basic", app => new OurBasicAuthStrategy(app, realm))
+    scentry.register("Basic", app => new OurBasicAuthStrategy(app, realm, db))
   }
 
 }
