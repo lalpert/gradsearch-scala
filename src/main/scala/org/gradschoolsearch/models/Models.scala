@@ -17,7 +17,9 @@ case class WebProfessor(id:Option[Int], name:String, school:String, department:S
 }
 
 case class User(id: Option[Int], email:String, passwordHash:String) {
-  def this(email:String, password:String) = {
-    this(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
+  def createUser(email:String, password:String) = {
+    User(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
   }
+
+
 }

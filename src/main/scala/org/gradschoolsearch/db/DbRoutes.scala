@@ -2,6 +2,8 @@ package org.gradschoolsearch.db
 
 import org.gradschoolsearch.db.DataLoader.ProfWithKeywords
 import org.gradschoolsearch.models.DBProfessor
+import org.gradschoolsearch.models.User
+import org.mindrot.jbcrypt.BCrypt
 
 import org.scalatra._
 
@@ -87,6 +89,23 @@ trait DbRoutes extends ScalatraServlet {
       addFakeData()
       addRealData()
       <h1>Total professors: {professors.size.run}</h1>
+    }
+  }
+
+  def createUser(email:String, password:String) = {
+    User(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
+  }
+
+  get("/db/create-user") {
+    db withDynSession {
+
+      // Create Users table if none exists
+      if (MTable.getTables("USERS").list.isEmpty) {
+        users.ddl.create
+      }
+
+      users insert createUser("Russell User", "pwdHash")
+      <h1>Total Users: {users.size.run}</h1>
     }
   }
 

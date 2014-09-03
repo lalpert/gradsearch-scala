@@ -32,6 +32,7 @@ object GradsearchBuild extends Build {
         "mysql" % "mysql-connector-java" % "latest.release",
         "c3p0" % "c3p0" % "0.9.1.2",
         "org.mindrot" % "jbcrypt" % "0.3m",
+        "org.scalatra" %% "scalatra-auth" % "2.3.0",
         "org.eclipse.jetty" % "jetty-webapp" % "9.1.3.v20140225" % "container",
         "org.eclipse.jetty" % "jetty-plus" % "9.1.3.v20140225" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
