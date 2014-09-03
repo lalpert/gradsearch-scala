@@ -13,8 +13,7 @@ To use Re:search, enter a research interest, department, university, or professo
 Professor data was scraped from university websites. We're in the process of updating our data and scraping tools.
 
 ## Build & Run ##
-Gradsearch requires a locally running mysql. Install mysql onto your local system for running gradsearch. Using JRebel
-significantly improves reload times.
+Re:search requires a locally running mysql. Install mysql onto your local system for running gradsearch. Use the Scala build tool (sbt) to run Re:search locally. Using JRebel significantly improves sbt reload times.
 
 ```sh
 $ cd gradsearch
