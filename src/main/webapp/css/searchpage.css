@@ -43,6 +43,11 @@ footer {
   margin-right: -10px;
 }
 
+.filter-header {
+  display: inline-block;
+  margin-right: 8px;
+}
+
 .grid-spacing {
   padding-left: 5px;
   padding-right: 5px;

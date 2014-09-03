@@ -1,20 +1,18 @@
 package org.gradschoolsearch.db
 
 import org.gradschoolsearch.db.DataLoader.ProfWithKeywords
-import org.gradschoolsearch.models.DBProfessor
-
+import org.gradschoolsearch.db.Tables._
+import org.gradschoolsearch.models.{DBProfessor, User}
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 import org.scalatra._
 
-import Tables._
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.jdbc.meta.MTable
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-import org.json4s.JsonDSL._
 
 case class OptFoo(foo: String, bar: Option[String])
-import scala.slick.jdbc.{GetResult, StaticQuery => Q}
+import scala.slick.jdbc.{StaticQuery => Q}
 trait DbRoutes extends ScalatraServlet {
 
   val db: Database
@@ -87,6 +85,21 @@ trait DbRoutes extends ScalatraServlet {
       addFakeData()
       addRealData()
       <h1>Total professors: {professors.size.run}</h1>
+    }
+  }
+
+  get("/db/create-user") {
+    db withDynSession {
+
+      // Create Users table if none exists
+      if (!MTable.getTables("USERS").list.isEmpty) {
+        users.ddl.drop
+      }
+      users.ddl.create
+
+
+      users insert User.createUser("Russell User", "pwdHash")
+      <h1>Total Users: {users.size.run}</h1>
     }
   }
 

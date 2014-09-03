@@ -1,13 +1,13 @@
 package org.gradschoolsearch.db
 
-import org.gradschoolsearch.models.DBProfessor
+import org.gradschoolsearch.models.{DBProfessor, User}
 
-import scala.slick.ast.Library.SqlOperator
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.lifted.Column
 
 
 object Tables {
+  // Dark magic that allows us to filter queries with full-text search
   def fullTextMatch[T](term: String, columns: String*): Column[Boolean] = {
     val column = columns mkString ","
     SimpleExpression.nullary[Boolean] { (qb) =>
@@ -15,8 +15,9 @@ object Tables {
     }
   }
 
+  // Professor data
   class Professors(tag: Tag) extends Table[DBProfessor](tag, "PROFESSORS") {
-    def id      = column[Int]("ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
+    def id      = column[Int]("ID", O.PrimaryKey, O.AutoInc)
     def name    = column[String]("NAME")
     def school  = column[String]("SCHOOL")
     def department    = column[String]("DEPARTMENT")
@@ -39,9 +40,33 @@ object Tables {
     def keywordId = column[Int]("KEYWORD_ID")
     def profIndex = index("prof_index", profId)
     def keywordIndex = index("keyword_index", keywordId)
-    // TODO: maybe add this:
-    //def profId = foreignKey("PROF_ID", id, professors)(_.id)
     def * = (profId, keywordId)
   }
   val professorKeywords = TableQuery[ProfessorKeywords]
+
+  // User data
+  class Users(tag: Tag) extends Table[User](tag, "USERS") {
+    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+    def email = column[String]("EMAIL")
+    def passwordHash = column[String]("PASSWORD_HASH")
+    def * = (id.?, email, passwordHash) <> ((User.apply _).tupled, User.unapply)
+    def emailIndex = index("email_index", email)
+  }
+  val users = TableQuery[Users]
+
+  class StarredProfs(tag:Tag) extends Table[(Int, Int)](tag, "STARRED_PROFS") {
+    def userId = column[Int]("USER_ID")
+    def profId = column[Int]("PROF_ID")
+    def * = (userId, profId)
+    def userIndex = index("user_index", userId)
+  }
+  val starredProfessors = TableQuery[StarredProfs]
+
+  class StarredSearches(tag:Tag) extends Table[(Int, String)](tag, "STARRED_SEARCHES") {
+    def userId = column[Int]("USER_ID")
+    def searchString = column[String]("SEARCH_STRING")
+    def * = (userId, searchString)
+    def userIndex = index("user_index", userId)
+  }
+  val starredSearches = TableQuery[StarredSearches]
 }

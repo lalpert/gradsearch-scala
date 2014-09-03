@@ -1,13 +1,9 @@
 package org.gradschoolsearch.www
 
+import org.gradschoolsearch.db.Tables._
 import org.gradschoolsearch.db.{DbRoutes, Tables}
-import Tables._
-import org.gradschoolsearch.models.Professor
-import org.gradschoolsearch.models.DBProfessor
-import org.gradschoolsearch.models.WebProfessor
-
-import org.scalatra._
-import scalate.ScalateSupport
+import org.gradschoolsearch.models.{Professor, WebProfessor}
+import org.gradschoolsearch.www.Auth.AuthenticationSupport
 
 // JSON-related libraries
 import org.json4s.{DefaultFormats, Formats}
@@ -22,7 +18,7 @@ case class ResultCounts(category: String, counts: Map[String, Int])
 case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts])
 
 class Gradsearch(val db: Database) extends GradsearchStack
-  with JacksonJsonSupport with DbRoutes {
+  with JacksonJsonSupport with DbRoutes with AuthenticationSupport {
   // Sets up automatic case class to JSON output serialization, required by
   // the JValueResult trait.
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -32,10 +28,26 @@ class Gradsearch(val db: Database) extends GradsearchStack
     contentType = formats("json")
   }
 
+  get("/auth-test") {
+    basicAuth
+    <html>
+      <body>
+        <h1>Hello from Scalatra</h1>
+        <p>You are authenticated.</p>
+      </body>
+    </html>
+  }
+
   // Website routes
   get("/") {
     contentType="text/html"
     ssp("/home")
+  }
+
+  get("/users") {
+    db withDynSession {
+      users.run
+    }
   }
 
   get("/search") {

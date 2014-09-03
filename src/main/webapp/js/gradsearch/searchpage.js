@@ -32,6 +32,7 @@ var SearchPage = React.createClass({
       //   "University": {"MIT": true, "Stanford": true},
       //   "Department": {"CS": true}
       // }
+      // TODO: Read initial filters from URL
       selectedFilters: {
         "Starred": {},
         "University": {},
@@ -40,11 +41,13 @@ var SearchPage = React.createClass({
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
+      // List of searches the user has starred before
+
     }
   },
 
-  buildUrl: function() {
-    var url = "/results?q=" + encodeURIComponent(this.props.searchString);
+  buildUrlParams: function() {
+    var url = "q=" + encodeURIComponent(this.props.searchString);
     _.each(this.state.selectedFilters, function(filterVals, filterName) {
       _.each(filterVals, function(checked, name) {
         if (checked) {
@@ -57,7 +60,7 @@ var SearchPage = React.createClass({
 
   getProfs: function() {
     var self = this;
-    var url = this.buildUrl();
+    var url = "/results?" + this.buildUrlParams();
     var jqxhr = $.get(url, function(data) {
       self.setState({
         visibleProfs: data.professors,
@@ -72,7 +75,19 @@ var SearchPage = React.createClass({
   updateFilters: function(title, name, checked) {
     var newFilters = this.state.selectedFilters
     newFilters[title][name] = checked;
+    this.setFilters(newFilters);
+  },
+
+  clearSection: function(title) {
+    var newFilters = this.state.selectedFilters
+    newFilters[title] = {};
+    this.setFilters(newFilters);
+  },
+
+  setFilters: function(newFilters) {
     this.setState({selectedFilters: newFilters});
+    var newUrl = "/search?" + this.buildUrlParams();
+    window.history.pushState("", "", newUrl);
     // Get the professors matching the new filters
     this.getProfs();
   },
@@ -138,9 +153,6 @@ var SearchPage = React.createClass({
   },
 
   setSearchStarred: function(starred) {
-
-    prof.starred = starred;
-    this.setState({visibleProfs: this.state.visibleProfs});
     // TODO: Ajax call to set state on server
   },
 
@@ -164,6 +176,7 @@ var SearchPage = React.createClass({
         <div className="col-sm-3">
           <FilterBar
             onChange={this.updateFilters}
+            clearSection={this.clearSection}
             filterOptions={this.state.filterOptions}
             selectedFilters={this.state.selectedFilters}
             numStarred={numStarred}
