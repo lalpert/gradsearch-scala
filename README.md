@@ -7,7 +7,8 @@ To use Re:search, enter a research interest, department, university, or professo
 
 ## Tech Stack ##
 
-* Backend: Scala, [Scalatra](www.scalatra.org)
+* Backend: [Scala](http://www.scala-lang.org/), [Scalatra](www.scalatra.org)
+* Database: [MySQL](http://www.mysql.com/)
 * Frontend: [React](http://facebook.github.io/react/)
 
 Professor data was scraped from university websites. We're in the process of updating our data and scraping tools.
