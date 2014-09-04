@@ -95,11 +95,26 @@ trait DbRoutes extends ScalatraServlet {
       if (!MTable.getTables("USERS").list.isEmpty) {
         users.ddl.drop
       }
-      users.ddl.create
+        users.ddl.create
 
 
       users insert User.createUser("Russell User", "pwdHash")
       <h1>Total Users: {users.size.run}</h1>
+    }
+  }
+
+  get("/users") {
+    db withDynSession {
+      users.run
+    }
+  }
+
+  get("/starred-profs") {
+    db withDynSession {
+      if (MTable.getTables("STARRED_PROFS").list.isEmpty) {
+        starredProfessors.ddl.create
+      }
+      starredProfessors.run
     }
   }
 

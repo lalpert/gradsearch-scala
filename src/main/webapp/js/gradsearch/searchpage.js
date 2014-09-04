@@ -145,11 +145,14 @@ var SearchPage = React.createClass({
       uniString + deptString;
   },
 
+
+
   setStarred: function(profId, starred) {
     var prof = this.findProf(profId);
     prof.starred = starred;
     this.setState({visibleProfs: this.state.visibleProfs});
-    // TODO: Ajax call to set state on server
+    // Send the starred info to the server
+    $.post("/star-prof", {profId: profId, starred: starred});
   },
 
   setSearchStarred: function(starred) {

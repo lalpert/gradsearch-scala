@@ -2,8 +2,9 @@ package org.gradschoolsearch.www
 
 import org.gradschoolsearch.db.Tables._
 import org.gradschoolsearch.db.{DbRoutes, Tables}
-import org.gradschoolsearch.models.{Professor, WebProfessor}
+import org.gradschoolsearch.models.{User, Professor, WebProfessor}
 import org.gradschoolsearch.www.Auth.AuthenticationSupport
+import org.mindrot.jbcrypt.BCrypt
 
 // JSON-related libraries
 import org.json4s.{DefaultFormats, Formats}
@@ -44,12 +45,6 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/home")
   }
 
-  get("/users") {
-    db withDynSession {
-      users.run
-    }
-  }
-
   get("/search") {
     contentType="text/html"
     val searchString = request.getParameter("q")
@@ -68,7 +63,6 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Professors whose name, school, or department match the search string
     val profFilter = professors.filter(prof => fullTextMatch(searchString, "name", "department", "school"))
 
-
     // All professors matching the search term
     val professorQuery = (profKeywordJoin union profFilter)
 
@@ -83,10 +77,15 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Group by prof, then extract the keywords for each prof
     val idMap = profKeywords.groupBy(_._1.id)
 
+    val sp = starredProfessors.filter(_.userId === user.id.get).map(_.profId).run.toSet
+    println("sp")
+    println(sp)
+
     val results = idMap.map { case (id, stuffList) =>
       val prof = stuffList.head._1
       val words = stuffList.map(_._2)
-      new WebProfessor(prof, words)
+      val starred = sp.contains(prof.id.get)
+      new WebProfessor(prof, words, starred)
     }
 
     results.toList
@@ -123,7 +122,37 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
+      // Check if each prof is starred by the user
+      if (user != null) {
+        val sps = starredProfessors.filter(_.userId === user.id.get).run
+
+      }
+
       Results(filteredProfs, List(uniCounts, deptCounts))
+    }
+  }
+
+  post("/star-prof") {
+    if (user == null) {
+      // TODO: Make anonymous user so we can save the user's data
+    } else {
+      db withDynSession {
+        // Add or remove prof-user pair to db
+        val profId = params("profId").toInt
+        val starred = params("starred").toBoolean
+        val userId = user.id.get
+        val existingPairs = starredProfessors.filter(
+          pair => (pair.profId === profId && pair.userId === userId))
+        val pairExists = (existingPairs.length.run > 0)
+
+        if (starred && !pairExists) {
+          // We need to put this pair in the db
+          starredProfessors insert (userId, profId)
+        } else if (!starred && pairExists) {
+          // We need to remove this pair from the db
+          existingPairs.delete
+        }
+      }
     }
   }
 
