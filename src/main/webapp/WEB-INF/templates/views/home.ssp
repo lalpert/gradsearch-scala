@@ -1,15 +1,22 @@
 #set (title)
 #end
-
+#set  (head)
+<link href="/css/home.css" rel="stylesheet">
+#end
 
 <div id="container">
-<div class="jumbotron">
-    <h1>re:search</h1>
-    <p>What are you interested in?</p>
-    <form id="search" action="search">
-        <input class="xlarge" name="q" type="text" size="30">
-        <input type="submit" value="Go" class="btn primary">
-    </form>
+<div class="jumbotron over-image search-container">
+    <h1 class="over-image">re:search</h1>
+    <p class="over-image">What are you interested in?</p>
+	<form class="form-inline" role="form" action="search">
+	  <div class="form-group form-group-">
+	    <label class="sr-only" for="lab">What are you interested in?</label>
+	    <input name="q" class="form-control input-sm search-box" placeholder="">
+	  </div>
+	  <button type="submit" class="search-button btn btn-primary btn-sm">Go</button>
+	</form>
+	    <p class="over-image">For example: <a href="/search?q=robotics">robotics</a>, 
+	    <a href="/search?q=systems biology">systems biology</a></p>
 </div>
 
 <!--<script type="text/jsx">

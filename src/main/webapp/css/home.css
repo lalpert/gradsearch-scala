@@ -1,0 +1,32 @@
+html { 
+  background: url(/images/home2.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+	background-color: transparent;
+}
+
+.over-image {
+	background-color: transparent;
+	color: white;
+}
+
+.search-box {
+	width: 200px !important;
+}
+
+.search-button {
+	font-size: 14px !important;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.search-container {
+
+		margin-top:103px;
+	
+}
