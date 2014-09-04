@@ -107,21 +107,40 @@ var FilterSection = React.createClass({
        showLink = <a href="#" onClick={this.showLess}>Show less</a>;
      }
 
-     var temp = 0
      var options = _.map(sortedChoices, function(arr) {
-        temp++;
         var name = arr[0];
         var num = arr[1];
         var checked = Boolean(self.props.selectedFilters[name]);
         return <FilterOption
-          key={title + name + temp}
+          key={title + name}
           title={title}
           checked={checked}
           value={name}
           num={num}
+          disabled={false}
           handleChange={self.props.handleChange}
         />
      });
+
+     // Find any selected filters that now have 0 results. We will show these grayed out to the user.
+     var allChoices = this.props.choices;
+     var extraNames = _.pick(this.props.selectedFilters, function(checked, name) {
+        return (checked && !_.has(allChoices, name));
+     });
+
+     var extraOptions = _.map(extraNames, function(checked, name) {
+       return <FilterOption
+          key={title + name}
+          title={title}
+          checked={true}
+          value={name}
+          num={0}
+          disabled={true}
+        />
+     });
+
+     // Add the new elements to the options list
+     options.push.apply(options, extraOptions);
 
      return <div>
         <span>
@@ -130,7 +149,7 @@ var FilterSection = React.createClass({
         </span>
         {options}
         {showLink}
-     </div>
+     </div>;
   }
 });
 
@@ -140,7 +159,8 @@ var FilterOption = React.createClass({
     value: React.PropTypes.string.isRequired,
     num: React.PropTypes.number.isRequired,
     checked: React.PropTypes.bool.isRequired,
-    handleChange: React.PropTypes.func.isRequired,
+    disabled: React.PropTypes.bool.isRequired,
+    handleChange: React.PropTypes.func,
   },
 
   handleClick: function(event) {
@@ -148,15 +168,16 @@ var FilterOption = React.createClass({
   },
 
   render: function() {
-    var title = this.props.title;
-    var value = this.props.value;
-    var num = this.props.num;
-    var checked = this.props.checked;
+    var props = this.props
+    var classes = props.disabled ? "disabled" : "";
+
     return <div className="checkbox">
-      <label>
-        <input type="checkbox" name={title} value={value} checked={checked} onChange={this.handleClick}/>
-        {value} ({num})
+      <label className={classes}>
+        <input type="checkbox" name={props.title} value={props.value}
+          checked={props.checked} disabled={props.disabled}
+          onChange={this.handleClick}/>
+        {props.value} ({props.num})
       </label>
-    </div>
+    </div>;
   }
 });
