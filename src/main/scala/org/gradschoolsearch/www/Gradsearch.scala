@@ -51,7 +51,10 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/search", "search" -> searchString)
   }
 
-  def getProfessors(searchString: String, starred: Boolean) = {
+  // TODO: move this somewhere better (some util function?)
+  def getCurrentUser = userOption
+
+  def getProfessors(searchString: String, starred: Boolean, userOpt: Option[User]) = {
 
     // Professors whose keywords match the search string
     val profKeywordJoin = for {
@@ -67,13 +70,13 @@ class Gradsearch(val db: Database) extends GradsearchStack
     val professorQuery = (profKeywordJoin union profFilter)
 
     // If starred, filter down to starred profs
-    val professorQueryWithStarred = if (starred) {
-      for {
+    val professorQueryWithStarred = (starred, userOpt) match {
+      case (true, Some(currentUser)) => for {
         p <- professorQuery
-        sp <- starredProfessors if sp.profId === p.id && sp.userId === user.id.get
+        sp <- starredProfessors if sp.profId === p.id && sp.userId === currentUser.id.get
       } yield p
-    } else {
-      professorQuery
+
+      case _ => professorQuery
     }
 
     // Get all research interests for those profs
@@ -87,7 +90,12 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Group by prof, then extract the keywords for each prof
     val idMap = profKeywords.groupBy(_._1.id)
 
-    val sp = starredProfessors.filter(_.userId === user.id.get).map(_.profId).run.toSet
+    // Check if each prof is starred by the user
+    val sp = userOpt match {
+      case Some(currentUser) => starredProfessors.filter(_.userId === user.id.get).map(_.profId).run.toSet
+      case None => Set[Int]()
+    }
+
     println("sp")
     println(sp)
 
@@ -108,12 +116,13 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val starredFilter = params.get("Starred") == Some("Starred")
       val schoolFilter = multiParams("University")
       val deptFilter = multiParams("Department")
+      val currentUser = getCurrentUser
 
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
       def deptFilterFunc(prof: Professor):Boolean = deptFilter.isEmpty || deptFilter.contains(prof.department)
 
       // Get professors who match search string, plus their keywords
-      val professorResults = getProfessors(searchString, starredFilter)
+      val professorResults = getProfessors(searchString, starredFilter, currentUser)
 
       // Get counts for all possible filters
       type ProfFilter = Professor => Boolean
@@ -133,25 +142,19 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      // Check if each prof is starred by the user
-      if (user != null) {
-        val sps = starredProfessors.filter(_.userId === user.id.get).run
-
-      }
-
       Results(filteredProfs, List(uniCounts, deptCounts))
     }
   }
 
   post("/star-prof") {
-    if (user == null) {
-      // TODO: Make anonymous user so we can save the user's data
-    } else {
+    val currentUserOpt = getCurrentUser
+    // TODO: If currentUser is None, make anonymous user so we can save the user's data
+    currentUserOpt.foreach { currentUser =>
       db withDynSession {
         // Add or remove prof-user pair to db
         val profId = params("profId").toInt
         val starred = params("starred").toBoolean
-        val userId = user.id.get
+        val userId = currentUser.id.get
         val existingPairs = starredProfessors.filter(
           pair => (pair.profId === profId && pair.userId === userId))
         val pairExists = (existingPairs.length.run > 0)
