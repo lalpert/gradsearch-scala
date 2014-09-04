@@ -2,9 +2,11 @@ package org.gradschoolsearch.www
 
 import org.gradschoolsearch.db.Tables._
 import org.gradschoolsearch.db.{DbRoutes, Tables}
-import org.gradschoolsearch.models.{User, Professor, WebProfessor}
+import org.gradschoolsearch.models.{DBProfessor, User, Professor, WebProfessor}
 import org.gradschoolsearch.www.Auth.AuthenticationSupport
 import org.mindrot.jbcrypt.BCrypt
+
+import scala.slick.lifted
 
 // JSON-related libraries
 import org.json4s.{DefaultFormats, Formats}
@@ -47,15 +49,14 @@ class Gradsearch(val db: Database) extends GradsearchStack
 
   get("/search") {
     contentType="text/html"
-    val searchString = request.getParameter("q")
+    val searchString = params.getOrElse("q", "")
     ssp("/search", "search" -> searchString)
   }
 
   // TODO: move this somewhere better (some util function?)
   def getCurrentUser = userOption
 
-  def getProfessors(searchString: String, starred: Boolean, userOpt: Option[User]) = {
-
+  def getProfsByKeyword(searchString: String): Query[Professors, DBProfessor, Seq] = {
     // Professors whose keywords match the search string
     val profKeywordJoin = for {
       pk <- professorKeywords
@@ -66,8 +67,17 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Professors whose name, school, or department match the search string
     val profFilter = professors.filter(prof => fullTextMatch(searchString, "name", "department", "school"))
 
-    // All professors matching the search term
-    val professorQuery = (profKeywordJoin union profFilter)
+    // Return query for all professors matching the search term
+    (profKeywordJoin union profFilter)
+  }
+
+  def getProfessors(searchString: String, starred: Boolean, userOpt: Option[User]) = {
+
+    // If there's a search string, get matching profs, else use all profs
+    val professorQuery = searchString match {
+      case "" => professors
+      case _ => getProfsByKeyword(searchString)
+    }
 
     // If starred, filter down to starred profs
     val professorQueryWithStarred = (starred, userOpt) match {
@@ -109,10 +119,11 @@ class Gradsearch(val db: Database) extends GradsearchStack
     results.toList
   }
 
+
   get("/results") {
     db withDynSession {
       // Get search params
-      val searchString = params("q").toLowerCase
+      val searchString = params.getOrElse("q", "").toLowerCase
       val starredFilter = params.get("Starred") == Some("Starred")
       val schoolFilter = multiParams("University")
       val deptFilter = multiParams("Department")
@@ -142,7 +153,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      Results(filteredProfs, List(uniCounts, deptCounts))
+      Results(filteredProfs.take(12), List(uniCounts, deptCounts))
     }
   }
 
