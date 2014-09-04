@@ -145,9 +145,8 @@ var SearchPage = React.createClass({
       uniString + deptString;
   },
 
-
-
   setStarred: function(profId, starred) {
+    // Instantly update the starred variables on the client
     var prof = this.findProf(profId);
     prof.starred = starred;
     this.setState({visibleProfs: this.state.visibleProfs});
