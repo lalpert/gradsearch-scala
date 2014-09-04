@@ -1,5 +1,5 @@
 html { 
-  background: url(/images/home.jpg) no-repeat center center fixed; 
+  background: url(/images/home2.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -23,4 +23,10 @@ body {
 	font-size: 14px !important;
 	padding-top: 4px;
 	padding-bottom: 4px;
+}
+
+.search-container {
+
+		margin-top:103px;
+	
 }
