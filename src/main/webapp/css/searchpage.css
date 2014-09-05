@@ -74,6 +74,11 @@ footer {
   padding-right: 10px;
 }
 
+.prof-image {
+    max-width: 127px;
+    max-height: 127px;
+}
+
 .prof-info {
  height: 100px;
 }

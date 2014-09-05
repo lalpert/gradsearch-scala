@@ -28,7 +28,7 @@ object DataLoader {
 
   def cleanData(incoming: InternalFormat): ProfWithKeywords = {
      ProfWithKeywords(
-      DBProfessor(None, incoming.name, incoming.school, incoming.department.getOrElse("No Department Known")),
+      DBProfessor(None, incoming.name, incoming.school, incoming.department.getOrElse("No Department Known"), incoming.image),
         incoming.keywords.map(_.take(250))
      )
   }
