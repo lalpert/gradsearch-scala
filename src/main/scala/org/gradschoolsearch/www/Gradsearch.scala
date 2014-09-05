@@ -44,7 +44,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   // Website routes
   get("/") {
     contentType="text/html"
-    ssp("/home")
+    ssp("/home", "userEmail" -> getCurrentUserEmail)
   }
 
   get("/search") {
