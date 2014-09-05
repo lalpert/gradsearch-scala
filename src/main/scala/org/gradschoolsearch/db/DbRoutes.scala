@@ -43,9 +43,9 @@ trait DbRoutes extends ScalatraServlet {
   private def addFakeData(): Unit = {
     // Insert some professors
     val fakeProfs = List(
-      ProfWithKeywords(DBProfessor(None, "Leah Alpert", "MIT", "CS"), List("robotics")),
-      ProfWithKeywords(DBProfessor(None, "Russell Cohen", "MIT", "EE"), List("algorithms", "robotics")),
-      ProfWithKeywords(DBProfessor(None, "Fake person", "Stanford", "CS"), List("computer vision"))
+      ProfWithKeywords(DBProfessor(None, "Leah Alpert", "MIT", "CS", Some("https://www.kastatic.org/images/headshots/interns/leah.jpg")), List("robotics")),
+      ProfWithKeywords(DBProfessor(None, "Russell Cohen", "MIT", "EE", Some("http://www.sumologic.com/_media/team/bio_russell.jpg")), List("algorithms", "robotics")),
+      ProfWithKeywords(DBProfessor(None, "Fake person", "Stanford", "CS", None), List("computer vision"))
     )
     fakeProfs.foreach(insertProfWithKeywords)
   }

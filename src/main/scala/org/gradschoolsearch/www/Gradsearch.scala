@@ -26,6 +26,9 @@ class Gradsearch(val db: Database) extends GradsearchStack
   // the JValueResult trait.
   protected implicit val jsonFormats: Formats = DefaultFormats
 
+  // TODO: move me somewhere proper
+  val defaultImage = "http://placehold.it/100x127"
+
   // Before every action runs, set the content type to be in JSON format.
   before() {
     contentType = formats("json")
@@ -113,7 +116,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val prof = stuffList.head._1
       val words = stuffList.map(_._2)
       val starred = sp.contains(prof.id.get)
-      new WebProfessor(prof, words, starred)
+      new WebProfessor(prof, words, starred, prof.image.getOrElse(defaultImage))
     }
 
     results.toList

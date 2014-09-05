@@ -55,7 +55,7 @@ var ProfBox = React.createClass({
       <div className="col-sm-6 col-lg-4 grid-spacing">
         <div className="thumbnail prof-div" onClick={this.handleClick}>
           <a className="pull-left prof-pic" href="#">
-            <img className="media-object" src="http://placehold.it/100x125" alt="Generic placeholder image"/>
+            <img className="media-object prof-image" src={this.props.profData.image} alt="Generic placeholder image"/>
           </a>
           <div className="star-div" onClick={this.setStarred}>
             <img src={"/images/" + starImg} height="20px"/>
