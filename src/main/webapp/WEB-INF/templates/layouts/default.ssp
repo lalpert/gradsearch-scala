@@ -1,6 +1,7 @@
 <%@ var body: String %>
 <%@ var title: String %>
 <%@ var head: String = "" %>
+<%@ var userEmail: String = "" %>
 
 <html>
 <head>
@@ -34,6 +35,15 @@
             <ul class="nav navbar-nav">
               <li class="active"><a href="/">Home</a></li>
               <li><a href="#">About</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+              #if (userEmail == "")
+                <a href="/login">Log In</a>
+              #else
+                <p class="navbar-text">Signed in as <a href="#" class="navbar-link">${userEmail}</a></p>
+              #end
+              </li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

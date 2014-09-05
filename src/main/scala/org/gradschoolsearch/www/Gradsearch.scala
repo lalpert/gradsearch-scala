@@ -53,11 +53,18 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
-    ssp("/search", "search" -> searchString)
+    ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail)
   }
 
   // TODO: move this somewhere better (some util function?)
   def getCurrentUser = userOption
+
+  def getCurrentUserEmail = {
+    userOption match {
+      case Some(currentUser) => currentUser.email
+      case None => ""
+    }
+  }
 
   def getProfsByKeyword(searchString: String): Query[Professors, DBProfessor, Seq] = {
     // Professors whose keywords match the search string
