@@ -137,6 +137,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val starredFilter = params.get("Starred") == Some("Starred")
       val schoolFilter = multiParams("University")
       val deptFilter = multiParams("Department")
+      val start = params.getOrElse("start", "0").toInt
+
       val currentUser = getCurrentUser
 
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
@@ -163,7 +165,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      Results(filteredProfs.take(12), List(uniCounts, deptCounts))
+      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts))
     }
   }
 
@@ -190,6 +192,4 @@ class Gradsearch(val db: Database) extends GradsearchStack
       }
     }
   }
-
-
 }
