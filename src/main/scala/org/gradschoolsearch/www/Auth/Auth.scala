@@ -45,6 +45,9 @@ trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[U
   val realm = "Scalatra Basic Auth Example"
   protected val scentryConfig = (new ScentryConfig {}).asInstanceOf[ScentryConfiguration]
 
+  // User object -> session string
+  protected def toSession   = { case usr: User => usr.id.get.toString }
+
   // Session string -> User object
   protected def fromSession = { case id: String =>
     db withDynSession {
@@ -52,18 +55,17 @@ trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[U
     }
   }
 
-  // User object -> session string
-  protected def toSession   = { case usr: User => usr.id.toString }
-
   // Registers our Auth strategy with Scentry
+  override protected def registerAuthStrategies = {
+    scentry.register("Basic", app => new OurBasicAuthStrategy(app, realm, db))
+  }
+
+  // Not sure what this does
   override protected def configureScentry = {
     scentry.unauthenticated {
       scentry.strategies("Basic").unauthenticated()
     }
   }
 
-  override protected def registerAuthStrategies = {
-    scentry.register("Basic", app => new OurBasicAuthStrategy(app, realm, db))
-  }
 
 }

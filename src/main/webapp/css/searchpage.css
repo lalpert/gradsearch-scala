@@ -87,6 +87,10 @@ footer {
   padding-left: 10px;
 }
 
+.disabled {
+  color: #aaaaaa;
+}
+
  /*
   * Off Canvas
   * --------------------------------------------------
