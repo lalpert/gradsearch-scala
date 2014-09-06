@@ -9,6 +9,9 @@ re:search
 <div class="jumbotron over-image search-container">
     <h1 class="over-image">re:search</h1>
     <p class="over-image">What are you interested in?</p>
+	<p class="over-image">For example: <a href="/search?q=robotics">robotics</a>, 
+	    <a href="/search?q=systems biology">systems biology</a>
+	</p>
 	<form class="form-inline" role="form" action="search">
 	  <div class="form-group form-group-">
 	    <label class="sr-only" for="lab">What are you interested in?</label>
@@ -16,8 +19,6 @@ re:search
 	  </div>
 	  <button type="submit" class="search-button btn btn-primary btn-sm">Go</button>
 	</form>
-	    <p class="over-image">For example: <a href="/search?q=robotics">robotics</a>, 
-	    <a href="/search?q=systems biology">systems biology</a></p>
 </div>
 
 <!--<script type="text/jsx">

@@ -96,6 +96,10 @@ footer {
   color: #aaaaaa;
 }
 
+.prof-modal-body {
+  overflow: auto;
+}
+
  /*
   * Off Canvas
   * --------------------------------------------------
