@@ -33,6 +33,11 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
       }
     }
   }
+
+  override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
+    println("IN UNAUTH")
+  }
+
 }
 
 
@@ -53,6 +58,14 @@ trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[U
     db withDynSession {
       users.filter(_.id === id.toInt).firstOption.get
     }
+  }
+
+  protected def ourBasicAuth()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    println("IN OUR BASIC AUTH!")
+    // TAKE THE REQUEST
+    // if username and password, try authenticating?
+    //
+    scentry.authenticate("Basic")
   }
 
   // Registers our Auth strategy with Scentry

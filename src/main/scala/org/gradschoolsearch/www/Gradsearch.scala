@@ -35,7 +35,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   get("/auth-test") {
-    basicAuth
+    ourBasicAuth
     <html>
       <body>
         <h1>Hello from Scalatra</h1>
