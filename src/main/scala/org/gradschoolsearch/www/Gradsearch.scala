@@ -56,6 +56,22 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail)
   }
 
+  get("/about") {
+    contentType="text/html"
+    db withDynSession {
+      val schoolCounts = professors.groupBy(_.school).map { case (school, profs) => (school, profs.length)}
+      val numSchools = professors.map(_.school).countDistinct.run
+      val numDepts = professors.map(_.department).countDistinct.run
+      val sortedSchools = schoolCounts.sortBy(_._2).map(_._1).run.toList
+      ssp("/about",
+        "numProfs" -> professors.length.run,
+        "numSchools" -> numSchools,
+        "numDepts" -> numDepts,
+        "sortedSchools" -> sortedSchools
+      )
+    }
+  }
+
   // TODO: move this somewhere better (some util function?)
   def getCurrentUser = userOption
 

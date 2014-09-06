@@ -1,0 +1,46 @@
+<%@ val numSchools: Int %>
+<%@ val numDepts: Int %>
+<%@ val numProfs: Int %>
+<%@ val sortedSchools: List[String] %>
+#set (title)
+About
+#end
+#set (head)
+<link href="/css/about.css" rel="stylesheet">
+#end
+
+<div class="container">
+    <h1>About</h1>
+    <p>
+        If you've ever tried to find graduate schools you may have found it to be an infuriating experience.
+        Existing search engines are focused around finding a particular school.  This makes sense for an
+        undergraduate education, but for graduate school it's all wrong.  You aren't looking for a school &#8212;
+        you're looking for a professor. Re:search solves that problem.  Enter your research interests, broad
+        or specific, and browse through professors from dozens of universities who are studying what you're
+        studying.
+    </p>
+    <p>
+        To use Re:search, enter a research interest, department, university, or professor's name into the search bar.
+        Re:search will display professors who match your query. Click on a professor to see their full profile,
+        including a research summary, awards, and publications. If you register for the site, you can bookmark
+        professors and save searches to view later.
+    </p>
+
+    <h1>The Stats</h1>
+    <h3>${numProfs} Professors</h3>
+    <h3>${numSchools} Schools</h3>
+    <ul>
+    #for (school <- sortedSchools)
+        <li>${school}</li>
+    #end
+    </ul>
+    <h3>${numDepts} Departments including</h3>
+    <ul>
+        <li>Computer Science</li>
+        <li>Biology</li>
+        <li>And not too many more (but more are coming soon!)</li>
+    </ul>
+
+    <h1>Contact Us</h1>
+    For questions or comments, contact us at russell.r.cohen AT gmail or leah.alpert AT gmail.
+</div>

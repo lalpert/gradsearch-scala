@@ -5,7 +5,7 @@
 
 <html>
 <head>
-  <title>Gradsearch ${title}</title>
+  <title>re:search | ${title}</title>
   <script src="/js/react/react.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
   <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
@@ -29,7 +29,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">re:search</a>
+            <a class="navbar-brand" href="/"><strong>re:</strong>search</a>
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
