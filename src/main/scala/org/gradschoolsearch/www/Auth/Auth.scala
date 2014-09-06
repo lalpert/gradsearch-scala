@@ -34,6 +34,17 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
     }
   }
 
+  override def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    println("in authenticate")
+    println("request")
+    println(request)
+    println(request.username)
+    println(request.password)
+    println("response")
+    println(response)
+    validate(request.username, request.password)
+  }
+
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
     println("IN UNAUTH")
   }
