@@ -148,24 +148,25 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val professorResults = getProfessors(searchString, starredFilter, currentUser)
 
       // Get counts for all possible filters
-      type ProfFilter = Professor => Boolean
-      def matchesFilters(prof: Professor, filters: Seq[ProfFilter]):Boolean = {
+      type ProfFilter = WebProfessor => Boolean
+      def matchesFilters(prof: WebProfessor, filters: Seq[ProfFilter]):Boolean = {
         filters.forall(filter => filter(prof))
       }
 
-      def getCount(category: String, otherFilters: Seq[ProfFilter], lens: Professor => String) = {
+      def getCount(category: String, otherFilters: Seq[ProfFilter], lens: WebProfessor => String) = {
         val filteredProfs = professorResults.filter(prof => matchesFilters(prof, otherFilters))
         ResultCounts(category, filteredProfs.groupBy(lens).mapValues(_.length))
       }
 
       val uniCounts = getCount("University", List(deptFilterFunc _), _.school)
       val deptCounts = getCount("Department", List(schoolFilterFunc _), _.department)
+      val starCounts = getCount("Starred", List(), _.starred.toString)
 
       // Actually do the filtering
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts))
+      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts, starCounts))
     }
   }
 

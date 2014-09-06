@@ -9,7 +9,7 @@ var FilterBar = React.createClass({
     clearSection: React.PropTypes.func.isRequired,
     filterOptions: React.PropTypes.array.isRequired,
     selectedFilters: React.PropTypes.object.isRequired,
-    numStarred: React.PropTypes.number.isRequired
+    numStarredClientSide: React.PropTypes.number.isRequired
   },
 
   getChoices: function(category) {
@@ -22,7 +22,11 @@ var FilterBar = React.createClass({
   },
 
   render: function() {
-    var starred = {"Starred": this.props.numStarred}
+    var serverSideStarred = this.getChoices("Starred")["true"];
+    if (!serverSideStarred) {
+        serverSideStarred = 0;
+    }
+    var starred = {"Starred": this.props.numStarredClientSide + serverSideStarred };
 
     return <div id="sidebar">
       <h4>Filter results by:</h4>

@@ -38,6 +38,19 @@ trait DbRoutes extends ScalatraServlet {
       professorKeywords.ddl.drop
     }
     professorKeywords.ddl.create
+
+    // Create Users table if none exists
+    if (!MTable.getTables("USERS").list.isEmpty) {
+      users.ddl.drop
+    }
+    users.ddl.create
+
+    if (!MTable.getTables("STARRED_PROFS").list.isEmpty) {
+      starredProfessors.ddl.drop
+    }
+    starredProfessors.ddl.create
+
+
   }
 
   private def addFakeData(): Unit = {
@@ -78,27 +91,24 @@ trait DbRoutes extends ScalatraServlet {
     }
   }
 
+  private def addTestUser() {
+    users insert User.createUser("test", "test")
+  }
+
   get("/db/create-data") {
 
     db withDynSession {
       dropAndCreateDb()
       addFakeData()
       addRealData()
+      addTestUser()
       <h1>Total professors: {professors.size.run}</h1>
     }
   }
 
   get("/db/create-user") {
     db withDynSession {
-
-      // Create Users table if none exists
-      if (!MTable.getTables("USERS").list.isEmpty) {
-        users.ddl.drop
-      }
-        users.ddl.create
-
-
-      users insert User.createUser("Russell User", "pwdHash")
+      users insert User.createUser("test", "test")
       <h1>Total Users: {users.size.run}</h1>
     }
   }
@@ -111,9 +121,6 @@ trait DbRoutes extends ScalatraServlet {
 
   get("/starred-profs") {
     db withDynSession {
-      if (MTable.getTables("STARRED_PROFS").list.isEmpty) {
-        starredProfessors.ddl.create
-      }
       starredProfessors.run
     }
   }
