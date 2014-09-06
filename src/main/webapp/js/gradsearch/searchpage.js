@@ -24,6 +24,7 @@ var SearchPage = React.createClass({
       // [
       //   {"category": "University", "counts": {"MIT": 2}},
       //   {"category": "Department", "counts": {"CS": 2,"EE": 2}}
+      //   {"category": "Starred", "counts": {"true": 5, "false": 0}}
       // ]
       filterOptions: [],
       // Starts with no filters; users can add filter by clicking uni/dept checkboxes
@@ -42,6 +43,9 @@ var SearchPage = React.createClass({
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
       // List of searches the user has starred before
+
+      // The number of professors we've starred by clicking on them on the client side.
+      clientSideStarredCount: 0
 
     }
   },
@@ -148,10 +152,15 @@ var SearchPage = React.createClass({
   setStarred: function(profId, starred) {
     // Instantly update the starred variables on the client
     var prof = this.findProf(profId);
-    prof.starred = starred;
-    this.setState({visibleProfs: this.state.visibleProfs});
-    // Send the starred info to the server
-    $.post("/star-prof", {profId: profId, starred: starred});
+    if (prof.starred != starred) {
+        prof.starred = starred;
+        var diff = starred ? 1 : -1;
+        this.setState({visibleProfs: this.state.visibleProfs, clientSideStarredCount: this.state.clientSideStarredCount + diff});
+        // Send the starred info to the server
+        $.post("/star-prof", {profId: profId, starred: starred});
+    } else {
+        console.warn("Called starred on a professor that was already starred");
+    }
   },
 
   setSearchStarred: function(starred) {
@@ -161,7 +170,7 @@ var SearchPage = React.createClass({
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     var currentProf = this.findProf(this.state.currentProfID);
-    var numStarred = _.where(visibleProfs, {starred: true}).length;
+    var numStarredClientSide = this.state.clientSideStarredCount;
     var starImg = "gray_star.png"; //this.props.search.starred ? "gold_star.png" : "gray_star.png";
 
     return (
@@ -181,7 +190,7 @@ var SearchPage = React.createClass({
             clearSection={this.clearSection}
             filterOptions={this.state.filterOptions}
             selectedFilters={this.state.selectedFilters}
-            numStarred={numStarred}
+            numStarredClientSide={numStarredClientSide}
           />
         </div>
 

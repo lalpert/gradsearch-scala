@@ -56,6 +56,22 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail)
   }
 
+  get("/about") {
+    contentType="text/html"
+    db withDynSession {
+      val schoolCounts = professors.groupBy(_.school).map { case (school, profs) => (school, profs.length)}
+      val numSchools = professors.map(_.school).countDistinct.run
+      val numDepts = professors.map(_.department).countDistinct.run
+      val sortedSchools = schoolCounts.sortBy(_._2).map(_._1).run.toList
+      ssp("/about",
+        "numProfs" -> professors.length.run,
+        "numSchools" -> numSchools,
+        "numDepts" -> numDepts,
+        "sortedSchools" -> sortedSchools
+      )
+    }
+  }
+
   // TODO: move this somewhere better (some util function?)
   def getCurrentUser = userOption
 
@@ -137,6 +153,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val starredFilter = params.get("Starred") == Some("Starred")
       val schoolFilter = multiParams("University")
       val deptFilter = multiParams("Department")
+      val start = params.getOrElse("start", "0").toInt
+
       val currentUser = getCurrentUser
 
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
@@ -146,24 +164,25 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val professorResults = getProfessors(searchString, starredFilter, currentUser)
 
       // Get counts for all possible filters
-      type ProfFilter = Professor => Boolean
-      def matchesFilters(prof: Professor, filters: Seq[ProfFilter]):Boolean = {
+      type ProfFilter = WebProfessor => Boolean
+      def matchesFilters(prof: WebProfessor, filters: Seq[ProfFilter]):Boolean = {
         filters.forall(filter => filter(prof))
       }
 
-      def getCount(category: String, otherFilters: Seq[ProfFilter], lens: Professor => String) = {
+      def getCount(category: String, otherFilters: Seq[ProfFilter], lens: WebProfessor => String) = {
         val filteredProfs = professorResults.filter(prof => matchesFilters(prof, otherFilters))
         ResultCounts(category, filteredProfs.groupBy(lens).mapValues(_.length))
       }
 
       val uniCounts = getCount("University", List(deptFilterFunc _), _.school)
       val deptCounts = getCount("Department", List(schoolFilterFunc _), _.department)
+      val starCounts = getCount("Starred", List(), _.starred.toString)
 
       // Actually do the filtering
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      Results(filteredProfs.take(12), List(uniCounts, deptCounts))
+      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts, starCounts))
     }
   }
 
@@ -190,6 +209,4 @@ class Gradsearch(val db: Database) extends GradsearchStack
       }
     }
   }
-
-
 }
