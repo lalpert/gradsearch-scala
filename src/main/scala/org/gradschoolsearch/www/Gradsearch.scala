@@ -35,7 +35,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   get("/auth-test") {
-    basicAuth
+    ourBasicAuth
     <html>
       <body>
         <h1>Hello from Scalatra</h1>
@@ -48,6 +48,16 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/") {
     contentType="text/html"
     ssp("/home", "userEmail" -> getCurrentUserEmail)
+  }
+
+  get("/login") {
+    contentType="text/html"
+    ssp("/login")
+  }
+
+  post("/login") {
+    ourBasicAuth
+    redirect("/")
   }
 
   get("/search") {
@@ -176,7 +186,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
 
       val uniCounts = getCount("University", List(deptFilterFunc _), _.school)
       val deptCounts = getCount("Department", List(schoolFilterFunc _), _.department)
-      val starCounts = getCount("Starred", List(), _.starred.toString)
+      val starCounts = getCount("Starred", List(deptFilterFunc _, schoolFilterFunc _), _.starred.toString)
 
       // Actually do the filtering
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
