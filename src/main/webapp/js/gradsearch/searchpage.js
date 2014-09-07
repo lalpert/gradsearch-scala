@@ -68,7 +68,8 @@ var SearchPage = React.createClass({
     var jqxhr = $.get(url, function(data) {
       self.setState({
         visibleProfs: data.professors,
-        filterOptions: data.counts
+        filterOptions: data.counts,
+        clientSideStarredCount: 0
       });
     });
   },

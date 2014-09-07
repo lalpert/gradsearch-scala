@@ -5,38 +5,27 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.gradschoolsearch.db.Tables._
 import org.gradschoolsearch.models.User
 import org.mindrot.jbcrypt.BCrypt
-import org.scalatra.ScalatraBase
+import org.scalatra.{Unauthorized, ScalatraBase}
 import org.scalatra.auth.strategy.{BasicAuthStrategy, BasicAuthSupport}
-import org.scalatra.auth.{ScentryConfig, ScentrySupport}
+import org.scalatra.auth.{ScentryStrategy, ScentryConfig, ScentrySupport}
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import net.iharder.Base64
 import scala.io.Codec
 import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
-import org.gradschoolsearch.www.Auth.OurBasicAuthStrategy.OurBasicAuthRequest
+import org.slf4j.LoggerFactory
 
-object OurBasicAuthStrategy {
-  class OurBasicAuthRequest(r: HttpServletRequest) {
+class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String, db:Database) extends ScentryStrategy[User] {
 
-    def username2 = r.getParameter("username")
-    def password2 = r.getParameter("password")
-  }
-}
+  override def name: String = "UserPassword"
+  val logger = LoggerFactory.getLogger(getClass)
 
-class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String, db:Database)
-  extends BasicAuthStrategy[User](app, realm) {
+  /***
+    * Determine whether the strategy should be run for the current request.
+    */
 
-  implicit def request2OurBasicAuthRequest(r: HttpServletRequest) = new OurBasicAuthRequest(r)
-
-  // Why do we need this?
-  protected def getUserId(user: User)
-                         (implicit request: HttpServletRequest, response: HttpServletResponse): String = {
-    user.id.toString
-  }
-
-  // Required method that returns a matching user or None
-  protected def validate(email: String, password: String)
+  def validate(email: String, password: String)
                         (implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     db withDynSession {
       val userOpt = users.filter(_.email === email).firstOption
@@ -47,25 +36,34 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
     }
   }
 
-  override def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-    println("in authenticate")
-    println("request")
-    println(request)
-    println(request.username2)
-    println(request.password2)
-    println("response")
-    println(response)
-    validate(request.username2, request.password2)
+  override def isValid(implicit request: HttpServletRequest) = {
+    val login = request.getParameter("username")
+    val password = request.getParameter("password")
+    logger.info("UserPasswordStrategy: determining isValid: " + (login != "" && password != "").toString())
+    login != "" && password != ""
   }
 
+  /**
+   *  In real life, this is where we'd consult our data store, asking it whether the user credentials matched
+   *  any existing user. Here, we'll just check for a known login/password combination and return a user if
+   *  it's found.
+   */
+  def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
+    logger.info("UserPasswordStrategy: attempting authentication")
+    val username = request.getParameter("username")
+    val password = request.getParameter("password")
+    validate(username, password)
+  }
+
+  /**
+   * What should happen if the user is currently not authenticated?
+   */
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
-    println("IN UNAUTH")
+    app.redirect("/login?failed=true")
   }
-
 }
 
-
-trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[User] {
+trait AuthenticationSupport extends ScentrySupport[User] {
   self: ScalatraBase =>
 
   val db:Database
@@ -86,14 +84,7 @@ trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[U
 
   protected def ourBasicAuth()(implicit request: HttpServletRequest,
                                                                  response: HttpServletResponse) = {
-    val baReq = new OurBasicAuthStrategy.OurBasicAuthRequest(request)
-    /*if(!baReq.providesAuth) {
-      response.setHeader("WWW-Authenticate", "Basic realm=\"%s\"" format realm)
-      halt(401, "Unauthenticated")
-    }
-    if(!baReq.isBasicAuth) {
-      halt(400, "Bad Request")
-    }*/
+
     scentry.authenticate("Basic")
   }
 
