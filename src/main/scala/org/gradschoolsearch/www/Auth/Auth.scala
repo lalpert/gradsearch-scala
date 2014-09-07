@@ -11,10 +11,23 @@ import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
+import net.iharder.Base64
+import scala.io.Codec
+import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
+import org.gradschoolsearch.www.Auth.OurBasicAuthStrategy.OurBasicAuthRequest
 
+object OurBasicAuthStrategy {
+  class OurBasicAuthRequest(r: HttpServletRequest) {
+
+    def username2 = r.getParameter("username")
+    def password2 = r.getParameter("password")
+  }
+}
 
 class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String, db:Database)
   extends BasicAuthStrategy[User](app, realm) {
+
+  implicit def request2OurBasicAuthRequest(r: HttpServletRequest) = new OurBasicAuthRequest(r)
 
   // Why do we need this?
   protected def getUserId(user: User)
@@ -38,11 +51,11 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
     println("in authenticate")
     println("request")
     println(request)
-    println(request.username)
-    println(request.password)
+    println(request.username2)
+    println(request.password2)
     println("response")
     println(response)
-    validate(request.username, request.password)
+    validate(request.username2, request.password2)
   }
 
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
@@ -71,11 +84,16 @@ trait AuthenticationSupport extends ScentrySupport[User] with BasicAuthSupport[U
     }
   }
 
-  protected def ourBasicAuth()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-    println("IN OUR BASIC AUTH!")
-    // TAKE THE REQUEST
-    // if username and password, try authenticating?
-    //
+  protected def ourBasicAuth()(implicit request: HttpServletRequest,
+                                                                 response: HttpServletResponse) = {
+    val baReq = new OurBasicAuthStrategy.OurBasicAuthRequest(request)
+    /*if(!baReq.providesAuth) {
+      response.setHeader("WWW-Authenticate", "Basic realm=\"%s\"" format realm)
+      halt(401, "Unauthenticated")
+    }
+    if(!baReq.isBasicAuth) {
+      halt(400, "Bad Request")
+    }*/
     scentry.authenticate("Basic")
   }
 
