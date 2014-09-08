@@ -7,11 +7,25 @@ Login/Register
 #end
 
 <div class="container">
+
+<div class="login-div">
   <form class="form-signin" role="form" action="/login" method="post">
-    <h2 class="form-signin-heading">Please sign in</h2>
+    <h2 class="form-signin-heading">Sign in</h2>
     <input name="username" type="text" class="form-control" placeholder="Email address" required autofocus>
     <input name="password" type="password" class="form-control" placeholder="Password" required>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
   </form>
+</div>
+
+<div class="register-div">
+  <form class="form-signin" role="form" action="/register" method="post">
+    <h2 class="form-signin-heading">Create an account</h2>
+    <input name="username" type="text" class="form-control" placeholder="Email address" required autofocus>
+    <input name="password" type="password" class="form-control" placeholder="Password" required>
+    <input name="passwordRepeat" type="password" class="form-control" placeholder="Re-enter password" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+  </form>
+</div>
+
 
 </div> <!-- /container -->

@@ -60,6 +60,49 @@ class Gradsearch(val db: Database) extends GradsearchStack
     redirect("/")
   }
 
+  post("/register") {
+    db withDynSession {
+
+      // TODO: Pull this logic into a separate function
+      val usernameOpt = params.get("username")
+      val passwordOpt = params.get("password")
+      val passwordRepeatOpt = params.get("passwordRepeat")
+
+      // Find errors or success
+      val UserInfoOrError = (usernameOpt, passwordOpt, passwordRepeatOpt) match {
+        case (Some(username), Some(password), Some(passwordRepeat)) => {
+          lazy val existingUser = users.filter(_.email === username).firstOption
+          if (passwordRepeat != password) {
+            Left("Passwords don't match")
+          } else if (existingUser != None) {
+            Left("User with that email already exists")
+          } else {
+            Right((username, password))
+          }
+        }
+        case _ => Left("Please fill in all fields")
+      }
+
+      UserInfoOrError match {
+        case Left(error) => {
+          contentType = "text/html"
+          ssp("/login", "error" -> error)
+        }
+        case Right((username, password)) => {
+
+          // Create the user
+          users insert User.createUser(username, password)
+
+          // Log the user in as the newly created user
+          ourBasicAuth
+
+          // TODO: Where should we redirect to?
+          redirect("/")
+        }
+      }
+    }
+  }
+
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
