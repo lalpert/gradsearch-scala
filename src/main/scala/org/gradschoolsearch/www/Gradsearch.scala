@@ -198,6 +198,10 @@ class Gradsearch(val db: Database) extends GradsearchStack
     results.toList
   }
 
+  get("/logout") {
+    logOut()
+    redirect("/")
+  }
 
   get("/results") {
     db withDynSession {

@@ -41,7 +41,7 @@
               #if (userEmail == "")
                 <a href="/login">Log In</a>
               #else
-                <p class="navbar-text">Signed in as <a href="#" class="navbar-link">${userEmail}</a></p>
+                <p class="navbar-text">Signed in as <a href="#" class="navbar-link">${userEmail}</a>. <a href="/logout">Logout</a></p>
               #end
               </li>
             </ul>
@@ -52,7 +52,8 @@
   ${unescape(body)}
 <div class="footer">
   <div class="footer-container">
-    <p class="text-muted">Copyright Leah and Russell Productions</p>
+    <p class="text-muted">Copyright Leah and Russell Productions. All rights reserved.
+    <a href="https://github.com/lalpert/gradsearch-scala">Source code.</a></p>
   </div>
 </div>
 </body>
