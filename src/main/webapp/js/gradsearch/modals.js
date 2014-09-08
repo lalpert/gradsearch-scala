@@ -66,6 +66,8 @@ var ModalDiv = React.createClass({
             <p>{this.props.currentProf.department}</p>
             <strong>Research Interests:</strong>
             <p>{this.props.currentProf.keywords.join(", ")}</p>
+            <hr/>
+            <div dangerouslySetInnerHTML={{__html: this.props.currentProf.bio}} />
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-default"

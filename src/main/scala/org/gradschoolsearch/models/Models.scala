@@ -9,12 +9,12 @@ trait Professor {
   val department:String
 }
 
-case class DBProfessor(id:Option[Int], name:String, school:String, department:String, image: Option[String]) extends Professor
+case class DBProfessor(id:Option[Int], name:String, school:String, department:String, image: Option[String], bio: Option[String]) extends Professor
 
 case class WebProfessor(id:Option[Int], name:String, school:String, department:String,
-                        keywords: Seq[String], starred: Boolean, image: String) extends Professor {
-  def this(p:Professor, keywords: Seq[String], starred: Boolean, image: String) = {
-    this(p.id, p.name, p.school, p.department, keywords, starred, image)
+                        keywords: Seq[String], starred: Boolean, image: String, bio: String) extends Professor {
+  def this(p:Professor, keywords: Seq[String], starred: Boolean, image: String, bio: String) = {
+    this(p.id, p.name, p.school, p.department, keywords, starred, image, bio)
   }
 }
 

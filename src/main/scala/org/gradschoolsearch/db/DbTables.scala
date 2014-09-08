@@ -22,7 +22,8 @@ object Tables {
     def school  = column[String]("SCHOOL")
     def department    = column[String]("DEPARTMENT")
     def image   = column[Option[String]]("IMAGE")
-    def * = (id.?, name, school, department, image) <> (DBProfessor.tupled, DBProfessor.unapply)
+    def bio     = column[Option[String]]("BIO", O.DBType("TEXT"))
+    def * = (id.?, name, school, department, image, bio) <> (DBProfessor.tupled, DBProfessor.unapply)
     def idx1 = index("main_index", name)
     def idx2 = index("dept_index", department)
   }

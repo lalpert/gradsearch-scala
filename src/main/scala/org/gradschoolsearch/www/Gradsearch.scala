@@ -149,7 +149,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val prof = stuffList.head._1
       val words = stuffList.map(_._2)
       val starred = sp.contains(prof.id.get)
-      new WebProfessor(prof, words, starred, prof.image.getOrElse(defaultImage))
+      new WebProfessor(prof, words, starred, prof.image.getOrElse(defaultImage), prof.bio.getOrElse(f"${prof.name} doesn't have a bio. <a>Add one!</a>"))
     }
 
     results.toList
