@@ -2,6 +2,7 @@
 #end
 
 <%@ val search: String %>
+<%@ val loggedIn: Boolean %>
 
 <!-- Maybe move this to react -->
 <div class="navbar navbar-default navbar-static-top" role="navigation">
@@ -40,7 +41,7 @@
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(
-    <SearchPage searchString="<%= search %>"/>,
+    <SearchPage searchString="<%= search %>" loggedIn={<%= loggedIn %>}/>,
     document.getElementById('container')
 );
 </script>

@@ -106,7 +106,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
-    ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail)
+    ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail, "loggedIn" -> userOption.isDefined)
   }
 
   get("/about") {
