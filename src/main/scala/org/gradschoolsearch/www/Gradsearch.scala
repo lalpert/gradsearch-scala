@@ -139,12 +139,12 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Professors whose keywords match the search string
     val profKeywordJoin = for {
       pk <- professorKeywords
-      k <- keywords if k.id === pk.keywordId && fullTextMatch(searchString, "keyword")
+      k <- keywords if k.id === pk.keywordId && fullTextMatch(searchString, false, "keyword")
       p <- professors if p.id === pk.profId
     } yield p
 
     // Professors whose name, school, or department match the search string
-    val profFilter = professors.filter(prof => fullTextMatch(searchString, "name", "department", "school"))
+    val profFilter = professors.filter(prof => fullTextMatch(searchString, true, "name", "department", "school"))
 
     // Return query for all professors matching the search term
     (profKeywordJoin union profFilter)
@@ -184,9 +184,6 @@ class Gradsearch(val db: Database) extends GradsearchStack
       case Some(currentUser) => starredProfessors.filter(_.userId === user.id.get).map(_.profId).run.toSet
       case None => Set[Int]()
     }
-
-    println("sp")
-    println(sp)
 
     val results = idMap.map { case (id, stuffList) =>
       val prof = stuffList.head._1

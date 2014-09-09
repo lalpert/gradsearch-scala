@@ -29,7 +29,6 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
                         (implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     db withDynSession {
       val userOpt = users.filter(_.email === email).firstOption
-      println(f"UserOpt: $userOpt")
       userOpt match {
         case None => None
         case Some(user) => if (BCrypt.checkpw(password, user.passwordHash)) Some(user) else None
@@ -53,7 +52,6 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
     logger.info("UserPasswordStrategy: attempting authentication")
     val username = request.getParameter("username")
     val password = request.getParameter("password")
-    println(f"Username and password: $username, $password")
     validate(username, password)
   }
 

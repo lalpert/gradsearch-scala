@@ -17,7 +17,6 @@ object DataLoader {
   val dataFields = schools.map(school => f"src/main/resources/data/$school.dat.json")
   implicit val formats = DefaultFormats
   def loadData() = {
-    println(new java.io.File(".").getAbsolutePath() + "hello2")
     dataFields.flatMap { fileName =>
       val file = Source.fromFile(fileName).mkString
       val json = parse(file)

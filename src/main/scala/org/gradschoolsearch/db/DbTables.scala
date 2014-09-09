@@ -8,10 +8,15 @@ import scala.slick.lifted.Column
 
 object Tables {
   // Dark magic that allows us to filter queries with full-text search
-  def fullTextMatch[T](term: String, columns: String*): Column[Boolean] = {
+  def fullTextMatch[T](term: String, wildcard: Boolean, columns: String*): Column[Boolean] = {
     val column = columns mkString ","
+    val str = if (wildcard) {
+      f"match($column) against ('$term*' in boolean mode)"
+    } else {
+      f"""match($column) against ('"$term"' in boolean mode)"""
+    }
     SimpleExpression.nullary[Boolean] { (qb) =>
-      qb.sqlBuilder += f"match($column) against ('$term*' in boolean mode)"
+      qb.sqlBuilder += str
     }
   }
 
