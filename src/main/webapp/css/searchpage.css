@@ -80,7 +80,12 @@ footer {
 }
 
 .prof-info {
- height: 100px;
+ height: 82px;
+}
+
+.prof-info p {
+  margin: 0px 0px 0px 0px;
+  font-size: 14px;
 }
 
 .prof-hr {
@@ -88,8 +93,16 @@ footer {
   margin-bottom: 3px;
 }
 
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .prof-keywords {
-  padding-left: 10px;
+  font-size: 13px;
+  overflow: hidden;
+  height: 38px;
 }
 
 .disabled {
@@ -98,6 +111,10 @@ footer {
 
 .prof-modal-body {
   overflow: auto;
+}
+
+.modal-above-fold {
+  min-height: 122px;
 }
 
  /*

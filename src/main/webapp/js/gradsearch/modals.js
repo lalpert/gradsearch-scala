@@ -59,13 +59,14 @@ var ModalDiv = React.createClass({
             <h4 className="modal-title" id="myModalLabel">{this.props.currentProf.name}</h4>
           </div>
           <div className="modal-body prof-modal-body">
-           
-            <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt="Generic placeholder image"/>
-            
-            <p>{this.props.currentProf.school}</p>
-            <p>{this.props.currentProf.department}</p>
-            <strong>Research Interests:</strong>
-            <p>{this.props.currentProf.keywords.join(", ")}</p>
+            <div className="modal-above-fold">
+              <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt="Generic placeholder image"/>
+              
+              <p>{this.props.currentProf.school}</p>
+              <p>{this.props.currentProf.department}</p>
+              <strong>Research Interests:</strong>
+              <p>{this.props.currentProf.keywords.join(", ")}</p>
+            </div>
             <hr/>
             <div dangerouslySetInnerHTML={{__html: this.props.currentProf.bio}} />
           </div>

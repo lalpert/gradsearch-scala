@@ -35,7 +35,9 @@ var ProfBox = React.createClass({
   },
 
   handleClick: function() {
-    this.props.showModal(this.props.profData.id);
+    if (!getSelection().toString()) {
+      this.props.showModal(this.props.profData.id);
+    }
   },
 
   setStarred: function(event) {
@@ -44,7 +46,7 @@ var ProfBox = React.createClass({
   },
 
   formatKeywords: function(keywords) {
-    return _.first(keywords, 3).join(", ");
+    return _.first(keywords, 6).join(", ");
   },
 
   render: function() {
@@ -64,7 +66,7 @@ var ProfBox = React.createClass({
               <div>
                 <h4 className="media-heading">{this.props.profData.name}</h4>
                 <p>{prof.school}</p>
-                <p>{prof.department}</p>
+                <p className="truncate">{prof.department}</p>
               </div>
           </div>
           <hr className="prof-hr"/>
