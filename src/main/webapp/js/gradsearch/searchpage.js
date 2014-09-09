@@ -18,6 +18,10 @@ var SearchPage = React.createClass({
       //   {name: "Leah", department: "CS", school: "MIT", ...},
       // ]
       visibleProfs: [],
+
+      // eg. 5
+      totalProfessors: 0,
+
       // All possible filters + counts that the user can filter by
       // Sent down by the server
       // Looks like:
@@ -27,6 +31,7 @@ var SearchPage = React.createClass({
       //   {"category": "Starred", "counts": {"true": 5, "false": 0}}
       // ]
       filterOptions: [],
+
       // Starts with no filters; users can add filter by clicking uni/dept checkboxes
       // selectedFilters will be look like:
       // {
@@ -69,6 +74,7 @@ var SearchPage = React.createClass({
       self.setState({
         visibleProfs: data.professors,
         filterOptions: data.counts,
+        totalProfessors: data.totalProfessors,
         clientSideStarredCount: 0
       });
     });
@@ -142,7 +148,7 @@ var SearchPage = React.createClass({
   // Turn search string + filters into a string
   getSearchString: function() {
     var visibleProfs = this.state.visibleProfs;
-    var numProfs = visibleProfs.length ? visibleProfs.length : "";
+    var numProfs = this.state.totalProfessors;
     var starredString = this.state.selectedFilters["Starred"]["Starred"] ? " starred" : "";
     var uniString = this.stringFromFilterList("University", "universities", "at");
     var deptString = this.stringFromFilterList("Department", "departments", "in");

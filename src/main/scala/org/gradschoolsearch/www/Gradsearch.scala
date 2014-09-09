@@ -18,7 +18,7 @@ import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 case class ResultCounts(category: String, counts: Map[String, Int])
-case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts])
+case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts], totalProfessors: Int)
 
 class Gradsearch(val db: Database) extends GradsearchStack
   with JacksonJsonSupport with DbRoutes with AuthenticationSupport {
@@ -236,7 +236,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val allFilters = List(deptFilterFunc _, schoolFilterFunc _)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
-      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts, starCounts))
+      Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts, starCounts), filteredProfs.length)
     }
   }
 
