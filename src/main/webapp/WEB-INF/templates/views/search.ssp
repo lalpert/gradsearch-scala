@@ -3,11 +3,11 @@
 
 <%@ val search: String %>
 <%@ val loggedIn: Boolean %>
+<%@ val filters: String %>
 
 <!-- Maybe move this to react -->
 <div class="navbar navbar-default navbar-static-top" role="navigation">
   <div class="container">
-
     <div class="navbar-header">
       <div>
         <form action="/search" method="get" class="form-inline header-searchbar" role="form">
@@ -21,8 +21,8 @@
 
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Starred searches</a></li>
-        <li><a href="/search?/Starred=Starred">Starred professors</a></li>
+        <li class="active"><a href="/search?q=&Starred=Starred">Starred searches</a></li>
+        <li><a href="/search?q=&Starred=Starred">Starred professors</a></li>
       </ul>
     </div><!--/.nav-collapse -->
 
@@ -41,7 +41,7 @@
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(
-    <SearchPage searchString="<%= search %>" loggedIn={<%= loggedIn %>}/>,
+    <SearchPage searchString="<%= search %>" loggedIn={<%= loggedIn %>} filters={ <%= unescape(filters) %> }/>,
     document.getElementById('container')
 );
 </script>

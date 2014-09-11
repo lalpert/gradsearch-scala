@@ -14,11 +14,18 @@ import org.json4s.{DefaultFormats, Formats}
 // JSON handling support from Scalatra
 import org.scalatra.json._
 
+import org.json4s._
+import org.json4s.jackson.Serialization
+import org.json4s.jackson.Serialization.{read, write}
+
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 case class ResultCounts(category: String, counts: Map[String, Int])
 case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts], totalProfessors: Int)
+
+// This format exactly matches the format of the filter configuration in searchpage.js. Don't change it!
+case class FilterConfig(Starred: Map[String, Boolean], University: Map[String, Boolean], Department: Map[String, Boolean])
 
 class Gradsearch(val db: Database) extends GradsearchStack
   with JacksonJsonSupport with DbRoutes with AuthenticationSupport {
@@ -106,11 +113,23 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
-    ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail, "loggedIn" -> userOption.isDefined)
+    val starredFilter = params.get("Starred") == Some("Starred")
+    val schoolFilter = multiParams("University")
+    val deptFilter = multiParams("Department")
+
+    def toMap(params: Seq[String]): Map[String, Boolean] = params.map(p => (p, true)).toMap
+    ssp("/search", 
+      "search" -> searchString, 
+      "userEmail" -> getCurrentUserEmail, 
+      "loggedIn" -> userOption.isDefined,
+      "filters" -> write(FilterConfig(Map("Starred" -> starredFilter), toMap(schoolFilter), toMap(deptFilter)))
+    )
   }
 
   get("/about") {
     contentType="text/html"
+
+implicit val formats = Serialization.formats(NoTypeHints)
     db withDynSession {
       val schoolCounts = professors.groupBy(_.school).map { case (school, profs) => (school, profs.length)}
       val numSchools = professors.map(_.school).countDistinct.run
