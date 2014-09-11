@@ -59,7 +59,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
 
   get("/login") {
     contentType="text/html"
-    ssp("/login")
+    val failed = (params.get("failed") == Some("true"))
+    ssp("/login", "failed" -> failed)
   }
 
   post("/login") {
