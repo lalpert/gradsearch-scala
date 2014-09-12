@@ -7,8 +7,9 @@
  */
 var SearchPage = React.createClass({
   propTypes: {
-    searchString: React.PropTypes.string,
-    loggedIn: React.PropTypes.bool
+    searchString: React.PropTypes.string.isRequired,
+    filters: React.PropTypes.object.isRequired,
+    loggedIn: React.PropTypes.bool.isRequired
   },
 
   getInitialState: function() {
@@ -40,11 +41,7 @@ var SearchPage = React.createClass({
       //   "Department": {"CS": true}
       // }
       // TODO: Read initial filters from URL
-      selectedFilters: {
-        "Starred": {},
-        "University": {},
-        "Department": {}
-      },
+      selectedFilters: this.props.filters,
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,

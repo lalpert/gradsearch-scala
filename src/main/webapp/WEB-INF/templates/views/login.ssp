@@ -1,3 +1,4 @@
+<%@ val failed: Boolean %>
 #set (title)
 Login/Register
 #end
@@ -13,6 +14,9 @@ Login/Register
     <h2 class="form-signin-heading">Sign in</h2>
     <input name="username" type="text" class="form-control" placeholder="Email address" required autofocus>
     <input name="password" type="password" class="form-control" placeholder="Password" required>
+    #if (failed)
+      <div class="alert alert-danger form-control" role="alert">Invalid username or password.</div>
+    #end
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
   </form>
 </div>
