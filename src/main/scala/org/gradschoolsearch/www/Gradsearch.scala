@@ -35,7 +35,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   get("/auth-test") {
-    ourBasicAuth
+    loginAuth
     <html>
       <body>
         <h1>Hello from Scalatra</h1>
@@ -56,7 +56,12 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   post("/login") {
-    ourBasicAuth
+    loginAuth
+    redirect("/")
+  }
+
+  get("/create-anon-user") {
+    anonUserAuth
     redirect("/")
   }
 
@@ -90,11 +95,32 @@ class Gradsearch(val db: Database) extends GradsearchStack
         }
         case Right((username, password)) => {
 
-          // Create the user
-          users insert User.createUser(username, password)
+          // If anon user, update
+          userOption match {
 
-          // Log the user in as the newly created user
-          ourBasicAuth
+            // Upgrade anon user to real user
+            case Some(currentUser) if currentUser.anonymous => {
+
+              println("ALREADY logged in as anonymous user")
+              val u = users.filter(_.id === currentUser.id).map {
+                uu => (uu.email, uu.passwordHash, uu.anonymous)
+              }
+              u.update(username, User.hashPassword(password), false)
+            }
+
+            // They're already logged in as a full user.
+            // TODO: Throw an error or something
+            case Some(currentUser) => {
+              println("ALREADY logged in as FULL user")
+            }
+
+            // No current user: Create new user + log in
+            case _ => {
+              println("Not logged in yet; creating new user")
+              users insert User.createUser(username, password)
+              loginAuth
+            }
+          }
 
           // TODO: Where should we redirect to?
           redirect("/")
@@ -106,6 +132,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
+    println(f"CURRENT USER $userOption")
     ssp("/search", "search" -> searchString, "userEmail" -> getCurrentUserEmail, "loggedIn" -> userOption.isDefined)
   }
 

@@ -18,10 +18,18 @@ case class WebProfessor(id:Option[Int], name:String, school:String, department:S
   }
 }
 
-case class User(id:Option[Int], email:String, passwordHash:String)
+case class User(id:Option[Int], email:String, passwordHash:String, anonymous:Boolean)
 
 object User {
   def createUser(email:String, password:String) = {
-    User(None, email, BCrypt.hashpw(password, BCrypt.gensalt()))
+    User(None, email, hashPassword(password), false)
+  }
+
+  def createAnonymousUser() = {
+    User(None, "", "", true)
+  }
+
+  def hashPassword(password:String) = {
+    BCrypt.hashpw(password, BCrypt.gensalt())
   }
 }

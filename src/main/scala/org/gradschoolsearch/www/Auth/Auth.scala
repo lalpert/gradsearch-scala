@@ -16,7 +16,38 @@ import scala.io.Codec
 import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
 import org.slf4j.LoggerFactory
 
-class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: String, db:Database) extends ScentryStrategy[User] {
+class AnonUserStrategy(protected override val app: ScalatraBase, realm: String, db:Database) extends ScentryStrategy[User] {
+
+  override def name: String = "AnonUser"
+  val logger = LoggerFactory.getLogger(getClass)
+
+  override def isValid(implicit request: HttpServletRequest) = {
+    logger.info("AnonUserStrategy: determining isValid")
+    true
+  }
+
+  def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
+    logger.info("AnonUserStrategy: attempting authentication")
+    db withDynSession {
+      // TODO: check if already logged in?
+      val newUser = User.createAnonymousUser()
+      val userId = (users returning users.map(_.id)) += newUser
+      val newUserWithId  = newUser.copy(id = Some(userId))
+      println(f"New user: $newUserWithId")
+
+      Some(newUserWithId)
+    }
+  }
+
+  /**
+   * What should happen if the user is currently not authenticated?
+   */
+  override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
+    logger.info("AnonUserStrategy: unauthenticated")
+  }
+}
+
+class LoginStrategy(protected override val app: ScalatraBase, realm: String, db:Database) extends ScentryStrategy[User] {
 
   override def name: String = "UserPassword"
   val logger = LoggerFactory.getLogger(getClass)
@@ -44,9 +75,7 @@ class OurBasicAuthStrategy(protected override val app: ScalatraBase, realm: Stri
   }
 
   /**
-   *  In real life, this is where we'd consult our data store, asking it whether the user credentials matched
-   *  any existing user. Here, we'll just check for a known login/password combination and return a user if
-   *  it's found.
+   *  Called when anonUserAuth() is called
    */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     logger.info("UserPasswordStrategy: attempting authentication")
@@ -73,30 +102,43 @@ trait AuthenticationSupport extends ScentrySupport[User] {
   protected val scentryConfig = (new ScentryConfig {}).asInstanceOf[ScentryConfiguration]
 
   // User object -> session string
-  protected def toSession   = { case usr: User => usr.id.get.toString }
+  protected def toSession   = {
+
+    case usr: User => {
+      println(f"TO SESSION $usr")
+      usr.id.get.toString
+
+    }
+  }
 
   // Session string -> User object
   protected def fromSession = { case id: String =>
     db withDynSession {
-      users.filter(_.id === id.toInt).firstOption.get
+      val u = users.filter(_.id === id.toInt).firstOption.get
+      println(f"FROM SESSION $u - $id")
+      u
     }
   }
 
-  protected def ourBasicAuth()(implicit request: HttpServletRequest,
-                                                                 response: HttpServletResponse) = {
+  protected def loginAuth()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    scentry.authenticate("Login")
+  }
 
-    scentry.authenticate("Basic")
+  protected def anonUserAuth()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    scentry.authenticate("Anon")
   }
 
   // Registers our Auth strategy with Scentry
   override protected def registerAuthStrategies = {
-    scentry.register("Basic", app => new OurBasicAuthStrategy(app, realm, db))
+    scentry.register("Login", app => new LoginStrategy(app, realm, db))
+    scentry.register("Anon", app => new AnonUserStrategy(app, realm, db))
   }
 
   // Not sure what this does
+  // TODO: maybe add the anon strategy here?
   override protected def configureScentry = {
     scentry.unauthenticated {
-      scentry.strategies("Basic").unauthenticated()
+      scentry.strategies("Login").unauthenticated()
     }
   }
 

@@ -56,7 +56,8 @@ object Tables {
     def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
     def email = column[String]("EMAIL")
     def passwordHash = column[String]("PASSWORD_HASH")
-    def * = (id.?, email, passwordHash) <> ((User.apply _).tupled, User.unapply)
+    def anonymous = column[Boolean]("ANONYMOUS")
+    def * = (id.?, email, passwordHash, anonymous) <> ((User.apply _).tupled, User.unapply)
     def emailIndex = index("email_index", email)
   }
   val users = TableQuery[Users]
