@@ -156,11 +156,6 @@ var SearchPage = React.createClass({
 
   setStarred: function(profId, starred) {
     // Instantly update the starred variables on the client
-    if (!this.props.loggedIn) {
-      // TODO: implement anonymous users, or something
-      console.log("Can't star. You need to login.");
-      return;
-    }
     var prof = this.findProf(profId);
     if (prof.starred != starred) {
         prof.starred = starred;

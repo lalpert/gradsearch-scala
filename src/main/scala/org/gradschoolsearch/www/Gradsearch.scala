@@ -290,9 +290,12 @@ implicit val formats = Serialization.formats(NoTypeHints)
   }
 
   post("/star-prof") {
-    val currentUserOpt = getCurrentUser
-    // TODO: If currentUser is None, make anonymous user so we can save the user's data
-    currentUserOpt.foreach { currentUser =>
+    // If current user is None, make anonymous user so we can save the user's data
+    if (!userOption.isDefined) {
+      anonUserAuth
+    }
+
+    userOption.foreach { currentUser =>
       db withDynSession {
         // Add or remove prof-user pair to db
         val profId = params("profId").toInt
