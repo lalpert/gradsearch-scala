@@ -3,6 +3,7 @@
 
 <%@ val search: String %>
 <%@ val loggedIn: Boolean %>
+<%@ val isFullUser: Boolean %>
 <%@ val filters: String %>
 
 <!-- Maybe move this to react -->
@@ -41,7 +42,12 @@
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(
-    <SearchPage searchString="<%= search %>" loggedIn={<%= loggedIn %>} filters={ <%= unescape(filters) %> }/>,
+    <SearchPage
+      searchString="<%= search %>"
+      loggedIn={<%= loggedIn %>}
+      isFullUser={<%= isFullUser %>}
+      filters={ <%= unescape(filters) %> }
+    />,
     document.getElementById('container')
 );
 </script>

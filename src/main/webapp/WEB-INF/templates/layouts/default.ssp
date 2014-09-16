@@ -6,16 +6,27 @@
 <html>
 <head>
   <title>re:search | ${title}</title>
-  <script src="/js/react/react.js"></script>
+  <script src="/js/react/react-with-addons.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
   <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
   <script src="/js/jquery/jquery-1.11.1.min.js"></script>
   <script src="/js/underscore/underscore-min.js"></script>
   <script src="/js/bootstrap/bootstrap.js"></script>
+  <script src="/js/jquery-cookie-1.4.1/jquery.cookie.js"></script>
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
   <link href="/css/default.css" rel="stylesheet">
   ${unescape(head)}
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54842452-1', 'auto');
+    ga('send', 'pageview');
+</script>
 </head>
 
 <body>

@@ -28,7 +28,7 @@ case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts], tot
 case class FilterConfig(Starred: Map[String, Boolean], University: Map[String, Boolean], Department: Map[String, Boolean])
 
 class Gradsearch(val db: Database) extends GradsearchStack
-  with JacksonJsonSupport with DbRoutes with AuthenticationSupport {
+  with JacksonJsonSupport with DbRoutes with LoginRegisterRoutes with AuthenticationSupport {
   // Sets up automatic case class to JSON output serialization, required by
   // the JValueResult trait.
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -41,14 +41,11 @@ class Gradsearch(val db: Database) extends GradsearchStack
     contentType = formats("json")
   }
 
-  get("/auth-test") {
-    loginAuth
-    <html>
-      <body>
-        <h1>Hello from Scalatra</h1>
-        <p>You are authenticated.</p>
-      </body>
-    </html>
+  def getCurrentUserEmail = {
+    userOption match {
+      case Some(currentUser) => currentUser.email
+      case None => ""
+    }
   }
 
   // Website routes
@@ -159,6 +156,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       "search" -> searchString, 
       "userEmail" -> getCurrentUserEmail, 
       "loggedIn" -> userOption.isDefined,
+      "isFullUser" -> (userOption.isDefined && !user.anonymous),
       "filters" -> write(FilterConfig(Map("Starred" -> starredFilter), toMap(schoolFilter), toMap(deptFilter)))
     )
   }
@@ -166,7 +164,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/about") {
     contentType="text/html"
 
-implicit val formats = Serialization.formats(NoTypeHints)
+    implicit val formats = Serialization.formats(NoTypeHints)
     db withDynSession {
       val schoolCounts = professors.groupBy(_.school).map { case (school, profs) => (school, profs.length)}
       val numSchools = professors.map(_.school).countDistinct.run
@@ -178,16 +176,6 @@ implicit val formats = Serialization.formats(NoTypeHints)
         "numDepts" -> numDepts,
         "sortedSchools" -> sortedSchools
       )
-    }
-  }
-
-  // TODO: move this somewhere better (some util function?)
-  def getCurrentUser = userOption
-
-  def getCurrentUserEmail = {
-    userOption match {
-      case Some(currentUser) => currentUser.email
-      case None => ""
     }
   }
 
@@ -265,13 +253,11 @@ implicit val formats = Serialization.formats(NoTypeHints)
       val deptFilter = multiParams("Department")
       val start = params.getOrElse("start", "0").toInt
 
-      val currentUser = getCurrentUser
-
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
       def deptFilterFunc(prof: Professor):Boolean = deptFilter.isEmpty || deptFilter.contains(prof.department)
 
       // Get professors who match search string, plus their keywords
-      val professorResults = getProfessors(searchString, starredFilter, currentUser)
+      val professorResults = getProfessors(searchString, starredFilter, userOption)
 
       // Get counts for all possible filters
       type ProfFilter = WebProfessor => Boolean
@@ -296,10 +282,58 @@ implicit val formats = Serialization.formats(NoTypeHints)
     }
   }
 
+  get("/starred-search") {
+    val searchString = params("searchString")
+    println(searchString)
+    userOption match {
+      case Some(currentUser) => {
+        db withDynSession {
+          println(f"In /starred-search")
+          val existingSearch = starredSearches.filter(
+            pair => (pair.searchString === searchString && pair.userId === currentUser.id.get))
+          existingSearch.length.run > 0
+        }
+      }
+      case None => false
+    }
+  }
+
+  post("/star-search") {
+    // If current user is None, make anonymous user so we can save the user's data
+    if (!userOption.isDefined) {
+      anonUserAuth
+    }
+
+    userOption.foreach { currentUser =>
+      db withDynSession {
+        // Add or remove prof-user pair to db
+        val searchString = params("searchString")
+        val starred = params("starred").toBoolean
+        val userId = currentUser.id.get
+        println(f"Setting starred ${searchString}, ${starred}")
+        val existingSearch = starredSearches.filter(
+          pair => (pair.searchString === searchString && pair.userId === userId))
+        val pairExists = (existingSearch.length.run > 0)
+        println(f"Exists: ${pairExists}")
+
+        if (starred && !pairExists) {
+          // We need to put this pair in the db
+          starredSearches insert (userId, searchString)
+        } else if (!starred && pairExists) {
+          // We need to remove this pair from the db
+          existingSearch.delete
+        }
+      }
+    }
+  }
+
   post("/star-prof") {
-    val currentUserOpt = getCurrentUser
-    // TODO: If currentUser is None, make anonymous user so we can save the user's data
-    currentUserOpt.foreach { currentUser =>
+    // If current user is None, make anonymous user so we can save the user's data
+    if (!userOption.isDefined) {
+      anonUserAuth
+    }
+
+    userOption.foreach { currentUser =>
       db withDynSession {
         // Add or remove prof-user pair to db
         val profId = params("profId").toInt

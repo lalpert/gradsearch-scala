@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
 /**
  * The entire search page
  * Holds state for the whole page, including the list of all profs matching the search term and the currently selected
@@ -9,7 +11,8 @@ var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string.isRequired,
     filters: React.PropTypes.object.isRequired,
-    loggedIn: React.PropTypes.bool.isRequired
+    loggedIn: React.PropTypes.bool.isRequired,
+    isFullUser: React.PropTypes.bool.isRequired,
   },
 
   getInitialState: function() {
@@ -42,14 +45,16 @@ var SearchPage = React.createClass({
       // }
       // TODO: Read initial filters from URL
       selectedFilters: this.props.filters,
+
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
       // List of searches the user has starred before
 
       // The number of professors we've starred by clicking on them on the client side.
-      clientSideStarredCount: 0
+      clientSideStarredCount: 0,
 
+      isSearchStarred: false,
     }
   },
 
@@ -78,6 +83,17 @@ var SearchPage = React.createClass({
     });
   },
 
+  getSearchStarred: function() {
+    var self = this;
+    var url = "/starred-search";
+    var jqxhr = $.get(url, {searchString: window.location.search})
+    .done(function( data ) {
+      self.setState({
+        isSearchStarred: data
+      });
+    });
+  },
+
   /**
    * Add or remove a filter
    */
@@ -99,6 +115,7 @@ var SearchPage = React.createClass({
     window.history.pushState("", "", newUrl);
     // Get the professors matching the new filters
     this.getProfs();
+    this.getSearchStarred();
   },
 
   showProfModal: function(profId) {
@@ -156,16 +173,25 @@ var SearchPage = React.createClass({
 
   setStarred: function(profId, starred) {
     // Instantly update the starred variables on the client
-    if (!this.props.loggedIn) {
-      // TODO: implement anonymous users, or something
-      console.log("Can't star. You need to login.");
-      return;
-    }
     var prof = this.findProf(profId);
     if (prof.starred != starred) {
         prof.starred = starred;
+
         var diff = starred ? 1 : -1;
-        this.setState({visibleProfs: this.state.visibleProfs, clientSideStarredCount: this.state.clientSideStarredCount + diff});
+        var newClientCount =  this.state.clientSideStarredCount + diff;
+
+        this.setState({
+          // We altered visibleProfs, so explicitly re-set it here
+          visibleProfs: this.state.visibleProfs,
+          clientSideStarredCount: newClientCount
+        });
+
+        // If they are not logged in and have never hidden the anon user alert, show alert
+        var alertHidden = $.cookie('anonAlert') === "hide";
+        if (!this.props.isFullUser && !alertHidden) {
+          $.cookie('anonAlert', 'show');
+        }
+
         // Send the starred info to the server
         $.post("/star-prof", {profId: profId, starred: starred});
     } else {
@@ -173,15 +199,29 @@ var SearchPage = React.createClass({
     }
   },
 
+  closeAlert: function() {
+    $.cookie('anonAlert', 'hide');
+    // Trigger a reload
+    this.setState({});
+  },
+
   setSearchStarred: function(starred) {
-    // TODO: Ajax call to set state on server
+     this.setState({isSearchStarred: starred});
+     $.post("/star-search", {
+       searchString: window.location.search,
+       starred: starred
+     });
   },
 
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     var currentProf = this.findProf(this.state.currentProfID);
     var numStarredClientSide = this.state.clientSideStarredCount;
-    var starImg = "gray_star.png"; //this.props.search.starred ? "gold_star.png" : "gray_star.png";
+
+    var anonAlertDiv = "";
+    if ($.cookie('anonAlert') == 'show') {
+      anonAlertDiv = <AnonUserAlert key="anonalert" closeAlert={this.closeAlert}/>
+    }
 
     return (
       <div className="search-container">
@@ -205,13 +245,16 @@ var SearchPage = React.createClass({
         </div>
 
         <div className="col-sm-9">
-          <div className="alert alert-info search-string-div" role="alert">
-            {this.getSearchString()}
-            <div className="search-text-div">
-              <span>Save search</span>
-              <img src={"/images/" + starImg} className="search-star" height="25px" onClick={this.setSearchStarred}/>
-            </div>
-          </div>
+
+          <ReactCSSTransitionGroup transitionName="anonalert">
+            {anonAlertDiv}
+          </ReactCSSTransitionGroup>
+
+          <SearchInfo
+            searchString={this.getSearchString()}
+            setSearchStarred={this.setSearchStarred}
+            starred={this.state.isSearchStarred}
+          />
 
           <ProfSection
             profArray={visibleProfs}
@@ -227,5 +270,46 @@ var SearchPage = React.createClass({
     // Get the search results
     $("#navbar-search-box").val(this.props.searchString);
     this.getProfs();
+    this.getSearchStarred();
   },
  });
+
+
+var SearchInfo = React.createClass({
+  propTypes: {
+    searchString: React.PropTypes.string,
+    setSearchStarred: React.PropTypes.func,
+    starred: React.PropTypes.bool
+  },
+
+  render: function() {
+    var starImg = this.props.starred ? "gold_star.png" : "gray_star.png";
+
+    return <div className="alert alert-info search-string-div" role="alert">
+      {this.props.searchString}
+      <div className="search-text-div">
+        <span>Save search</span>
+        <img src={"/images/" + starImg} className="search-star" height="25px"
+          onClick={_.partial(this.props.setSearchStarred, !this.props.starred)}/>
+      </div>
+    </div>;
+  }
+});
+
+
+var AnonUserAlert = React.createClass({
+  propTypes: {
+    closeAlert: React.PropTypes.func
+  },
+
+  render: function() {
+    return <div className="alert alert-warning alert-dismissible search-string-div" role="alert">
+      <button type="button" className="close" onClick={this.props.closeAlert}>
+        <span aria-hidden="true">&times;</span>
+        <span className="sr-only">Close</span>
+      </button>
+      Nice, you starred your first professor! Be sure to <a href="/login">log in</a> so your stars will be
+      saved when you come back - otherwise, they'll be reset when you close the browser.
+    </div>;
+  }
+});

@@ -50,6 +50,10 @@ trait DbRoutes extends ScalatraServlet {
     }
     starredProfessors.ddl.create
 
+    if (!MTable.getTables("STARRED_SEARCHES").list.isEmpty) {
+      starredSearches.ddl.drop
+    }
+    starredSearches.ddl.create
 
   }
 
