@@ -54,13 +54,6 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/home", "userEmail" -> getCurrentUserEmail)
   }
 
-  get("/is-available") {
-    val username = params.get("username").getOrElse(halt(400, "Need to specify a username"));
-    db withDynSession {
-      users.filter(_.email === username).firstOption == None
-    }
-  }
-
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
