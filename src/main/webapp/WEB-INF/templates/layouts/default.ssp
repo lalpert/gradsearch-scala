@@ -16,6 +16,8 @@
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
   <link href="/css/default.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/images/grad-cap.png">
+  </head>
   ${unescape(head)}
 
 <script>

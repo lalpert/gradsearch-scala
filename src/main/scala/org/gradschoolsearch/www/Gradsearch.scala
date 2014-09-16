@@ -195,6 +195,27 @@ class Gradsearch(val db: Database) extends GradsearchStack
     }
   }
 
+  get("/starred-searches") {
+    contentType="text/html"
+
+    // If current user is None, make anonymous user so we can save the user's data
+    if (!userOption.isDefined) {
+      anonUserAuth
+    }
+
+    val starred = userOption match {
+      case Some(currentUser) =>
+      db withDynSession {
+        val starredQuery = starredSearches.filter(
+          pair => (pair.userId === currentUser.id.get)).map(_.searchString)
+        starredQuery.run
+      }
+      case _ => Seq()
+    }
+
+    ssp("/starredSearches", "starredSearches" -> write(starred))
+  }
+
   get("/starred-search") {
     val searchString = params("searchString")
     println(searchString)

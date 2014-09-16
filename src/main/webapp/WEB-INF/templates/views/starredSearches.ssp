@@ -1,10 +1,7 @@
 #set (title)
 #end
 
-<%@ val search: String %>
-<%@ val loggedIn: Boolean %>
-<%@ val isFullUser: Boolean %>
-<%@ val filters: String %>
+<%@ val starredSearches: String %>
 
 <!-- Maybe move this to react -->
 <div class="navbar navbar-default navbar-static-top" role="navigation">
@@ -33,21 +30,14 @@
 <div id="container"></div>
 
 <link href="/css/searchpage.css" rel="stylesheet">
-
-<script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
+<script type="text/jsx" src="/js/gradsearch/starredSearches.js"></script>
 <script type="text/jsx" src="/js/gradsearch/searchInfo.js"></script>
-<script type="text/jsx" src="/js/gradsearch/modals.js"></script>
-<script type="text/jsx" src="/js/gradsearch/filters.js"></script>
-<script type="text/jsx" src="/js/gradsearch/professors.js"></script>
 
 <script type="text/jsx">
 /** @jsx React.DOM */
 React.renderComponent(
-    <SearchPage
-      searchString="<%= search %>"
-      loggedIn={<%= loggedIn %>}
-      isFullUser={<%= isFullUser %>}
-      filters={ <%= unescape(filters) %> }
+    <StarredSearchPage
+      starredSearches={<%= unescape(starredSearches) %>}
     />,
     document.getElementById('container')
 );

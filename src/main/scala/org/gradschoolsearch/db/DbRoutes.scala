@@ -130,6 +130,12 @@ trait DbRoutes extends ScalatraServlet {
     }
   }
 
+  get("/all-starred-searches") {
+    db withDynSession {
+      starredSearches.run
+    }
+  }
+
   get("/db/test") {
     implicit val formats = DefaultFormats
     parse("{\"foo\": \"hey\", \"bar\": \"bey\", \"wat\": 5}").extract[OptFoo]

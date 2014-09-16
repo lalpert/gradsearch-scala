@@ -29,7 +29,7 @@ var SearchPage = React.createClass({
 
       // All possible filters + counts that the user can filter by
       // Sent down by the server
-      // Looks like:
+      // filterOptions looks like:
       // [
       //   {"category": "University", "counts": {"MIT": 2}},
       //   {"category": "Department", "counts": {"CS": 2,"EE": 2}}
@@ -38,26 +38,29 @@ var SearchPage = React.createClass({
       filterOptions: [],
 
       // Starts with no filters; users can add filter by clicking uni/dept checkboxes
-      // selectedFilters will be look like:
+      // selectedFilters looks like:
       // {
       //   "University": {"MIT": true, "Stanford": true},
       //   "Department": {"CS": true}
       // }
-      // TODO: Read initial filters from URL
       selectedFilters: this.props.filters,
 
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
-      // List of searches the user has starred before
 
       // The number of professors we've starred by clicking on them on the client side.
       clientSideStarredCount: 0,
 
+      // Whether the current search has been starred by the user.
+      // Fetched through ajax, then can be changed client-side.
       isSearchStarred: false,
     }
   },
 
+ /*
+  * Use the currently selected filters in this.state to build a URL for this search
+  */
   buildUrlParams: function() {
     var url = "q=" + encodeURIComponent(this.props.searchString);
     _.each(this.state.selectedFilters, function(filterVals, filterName) {
@@ -70,6 +73,9 @@ var SearchPage = React.createClass({
     return url;
   },
 
+ /*
+  * Fetch professors who match the current search + filters. Update state accordingly.
+  */
   getProfs: function() {
     var self = this;
     var url = "/results?" + this.buildUrlParams();
@@ -83,13 +89,16 @@ var SearchPage = React.createClass({
     });
   },
 
+  /*
+   * Find out whether the current search is starred by the user.
+   */
   getSearchStarred: function() {
     var self = this;
     var url = "/starred-search";
-    var jqxhr = $.get(url, {searchString: window.location.search})
-    .done(function( data ) {
+    var jqxhr = $.get(url, {searchString: this.buildUrlParams()})
+    .done(function(isStarred) {
       self.setState({
-        isSearchStarred: data
+        isSearchStarred: isStarred
       });
     });
   },
@@ -103,12 +112,19 @@ var SearchPage = React.createClass({
     this.setFilters(newFilters);
   },
 
+  /*
+   * Uncheck all boxes in a filter section (such as Universities)
+   */
   clearSection: function(title) {
     var newFilters = this.state.selectedFilters
     newFilters[title] = {};
     this.setFilters(newFilters);
   },
 
+  /*
+   * Given a new set of filters, update the URL, get the profs matching the search,
+   * and find out whether the search is starred.
+   */
   setFilters: function(newFilters) {
     this.setState({selectedFilters: newFilters});
     var newUrl = "/search?" + this.buildUrlParams();
@@ -118,6 +134,7 @@ var SearchPage = React.createClass({
     this.getSearchStarred();
   },
 
+  // Functions to determine which prof modal is currently shown
   showProfModal: function(profId) {
     this.setState({currentProfID: profId})
   },
@@ -145,32 +162,31 @@ var SearchPage = React.createClass({
     }
   },
 
-  stringFromFilterList: function(filterName, filterNamePlural, introString) {
-    var filter = this.state.selectedFilters[filterName];
-    var options = _.filter(_.keys(filter), function(opt) {
-       return filter[opt];
-    });
-
-    if (options.length === 0) {
-      return "";
-    } else if (options.length === 1) {
-      return " " + introString + " " + options[0];
-    } else {
-      return " " + introString + " " + options.length + " " + filterNamePlural;
+  /*
+   * Show the "Anonymous user" alert that tells people to log in to save their data.
+   * Use cookies to only show the alert if the user has not hidden it before.
+   */
+  maybeShowAlert: function() {
+    // If they are not logged in and have never hidden the anon user alert, show alert
+    var alertHidden = $.cookie('anonAlert') === "hide";
+    if (!this.props.isFullUser && !alertHidden) {
+      $.cookie('anonAlert', 'show');
     }
+    // Trigger a rerender
+    this.setState({});
   },
 
-  // Turn search string + filters into a string
-  getSearchString: function() {
-    var visibleProfs = this.state.visibleProfs;
-    var numProfs = this.state.totalProfessors;
-    var starredString = this.state.selectedFilters["Starred"]["Starred"] ? " starred" : "";
-    var uniString = this.stringFromFilterList("University", "universities", "at");
-    var deptString = this.stringFromFilterList("Department", "departments", "in");
-    return numProfs + starredString + " professors researching " + this.props.searchString +
-      uniString + deptString;
+  closeAlert: function() {
+    $.cookie('anonAlert', 'hide');
+    // Trigger a rerender
+    this.setState({});
   },
 
+  /*
+   * Star a professor.
+   * Update the star and the starred filter count on the client.
+   * Send the star info to the server. Show the Anon user alert if necessary.
+   */
   setStarred: function(profId, starred) {
     // Instantly update the starred variables on the client
     var prof = this.findProf(profId);
@@ -186,11 +202,7 @@ var SearchPage = React.createClass({
           clientSideStarredCount: newClientCount
         });
 
-        // If they are not logged in and have never hidden the anon user alert, show alert
-        var alertHidden = $.cookie('anonAlert') === "hide";
-        if (!this.props.isFullUser && !alertHidden) {
-          $.cookie('anonAlert', 'show');
-        }
+        this.maybeShowAlert();
 
         // Send the starred info to the server
         $.post("/star-prof", {profId: profId, starred: starred});
@@ -199,16 +211,16 @@ var SearchPage = React.createClass({
     }
   },
 
-  closeAlert: function() {
-    $.cookie('anonAlert', 'hide');
-    // Trigger a reload
-    this.setState({});
-  },
-
+  /*
+   * Star a search.
+   * Update the star on the client.
+   * Send the star info to the server. Show the Anon user alert if necessary.
+   */
   setSearchStarred: function(starred) {
      this.setState({isSearchStarred: starred});
+     this.maybeShowAlert();
      $.post("/star-search", {
-       searchString: window.location.search,
+       searchString: this.buildUrlParams(),
        starred: starred
      });
   },
@@ -250,10 +262,12 @@ var SearchPage = React.createClass({
             {anonAlertDiv}
           </ReactCSSTransitionGroup>
 
-          <SearchInfo
-            searchString={this.getSearchString()}
-            setSearchStarred={this.setSearchStarred}
+          <SearchInfoFromFilters
+            filters={this.state.selectedFilters}
+            numProfs={this.state.totalProfessors}
+            searchString={this.props.searchString}
             starred={this.state.isSearchStarred}
+            setSearchStarred={this.setSearchStarred}
           />
 
           <ProfSection
@@ -275,26 +289,6 @@ var SearchPage = React.createClass({
  });
 
 
-var SearchInfo = React.createClass({
-  propTypes: {
-    searchString: React.PropTypes.string,
-    setSearchStarred: React.PropTypes.func,
-    starred: React.PropTypes.bool
-  },
-
-  render: function() {
-    var starImg = this.props.starred ? "gold_star.png" : "gray_star.png";
-
-    return <div className="alert alert-info search-string-div" role="alert">
-      {this.props.searchString}
-      <div className="search-text-div">
-        <span>Save search</span>
-        <img src={"/images/" + starImg} className="search-star" height="25px"
-          onClick={_.partial(this.props.setSearchStarred, !this.props.starred)}/>
-      </div>
-    </div>;
-  }
-});
 
 
 var AnonUserAlert = React.createClass({
