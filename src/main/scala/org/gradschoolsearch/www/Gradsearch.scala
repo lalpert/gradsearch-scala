@@ -152,6 +152,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       "search" -> searchString, 
       "userEmail" -> getCurrentUserEmail, 
       "loggedIn" -> userOption.isDefined,
+      "isFullUser" -> (userOption.isDefined && !user.anonymous),
       "filters" -> write(FilterConfig(Map("Starred" -> starredFilter), toMap(schoolFilter), toMap(deptFilter)))
     )
   }
