@@ -63,6 +63,13 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/login", "failed" -> failed)
   }
 
+  get("/is-available") {
+    val username = params.get("username").getOrElse(halt(400, "Need to specify a username"));
+    db withDynSession {
+      users.filter(_.email === username).firstOption == None
+    }
+  }
+
   post("/login") {
     loginAuth
     redirect("/")
