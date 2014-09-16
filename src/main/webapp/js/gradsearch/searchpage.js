@@ -45,6 +45,7 @@ var SearchPage = React.createClass({
       // }
       // TODO: Read initial filters from URL
       selectedFilters: this.props.filters,
+
       // Which prof is currently displayed in the modal.
       // ID of the prof, or null when there is no modal displayed.
       currentProfID: null,
@@ -52,6 +53,8 @@ var SearchPage = React.createClass({
 
       // The number of professors we've starred by clicking on them on the client side.
       clientSideStarredCount: 0,
+
+      isSearchStarred: false,
     }
   },
 
@@ -80,6 +83,17 @@ var SearchPage = React.createClass({
     });
   },
 
+  getSearchStarred: function() {
+    var self = this;
+    var url = "/starred-search";
+    var jqxhr = $.get(url, {searchString: window.location.search})
+    .done(function( data ) {
+      self.setState({
+        isSearchStarred: data
+      });
+    });
+  },
+
   /**
    * Add or remove a filter
    */
@@ -101,6 +115,7 @@ var SearchPage = React.createClass({
     window.history.pushState("", "", newUrl);
     // Get the professors matching the new filters
     this.getProfs();
+    this.getSearchStarred();
   },
 
   showProfModal: function(profId) {
@@ -191,14 +206,17 @@ var SearchPage = React.createClass({
   },
 
   setSearchStarred: function(starred) {
-    // TODO: Ajax call to set state on server
+     this.setState({isSearchStarred: starred});
+     $.post("/star-search", {
+       searchString: window.location.search,
+       starred: starred
+     });
   },
 
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     var currentProf = this.findProf(this.state.currentProfID);
     var numStarredClientSide = this.state.clientSideStarredCount;
-    var starImg = "gray_star.png"; //this.props.search.starred ? "gold_star.png" : "gray_star.png";
 
     var anonAlertDiv = "";
     if ($.cookie('anonAlert') == 'show') {
@@ -232,13 +250,11 @@ var SearchPage = React.createClass({
             {anonAlertDiv}
           </ReactCSSTransitionGroup>
 
-          <div className="alert alert-info search-string-div" role="alert">
-            {this.getSearchString()}
-            <div className="search-text-div">
-              <span>Save search</span>
-              <img src={"/images/" + starImg} className="search-star" height="25px" onClick={this.setSearchStarred}/>
-            </div>
-          </div>
+          <SearchInfo
+            searchString={this.getSearchString()}
+            setSearchStarred={this.setSearchStarred}
+            starred={this.state.isSearchStarred}
+          />
 
           <ProfSection
             profArray={visibleProfs}
@@ -254,8 +270,32 @@ var SearchPage = React.createClass({
     // Get the search results
     $("#navbar-search-box").val(this.props.searchString);
     this.getProfs();
+    this.getSearchStarred();
   },
  });
+
+
+var SearchInfo = React.createClass({
+  propTypes: {
+    searchString: React.PropTypes.string,
+    setSearchStarred: React.PropTypes.func,
+    starred: React.PropTypes.bool
+  },
+
+  render: function() {
+    var starImg = this.props.starred ? "gold_star.png" : "gray_star.png";
+
+    return <div className="alert alert-info search-string-div" role="alert">
+      {this.props.searchString}
+      <div className="search-text-div">
+        <span>Save search</span>
+        <img src={"/images/" + starImg} className="search-star" height="25px"
+          onClick={_.partial(this.props.setSearchStarred, !this.props.starred)}/>
+      </div>
+    </div>;
+  }
+});
+
 
 var AnonUserAlert = React.createClass({
   propTypes: {

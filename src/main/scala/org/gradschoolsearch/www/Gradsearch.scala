@@ -28,7 +28,7 @@ case class Results(professors: Seq[WebProfessor], counts: Seq[ResultCounts], tot
 case class FilterConfig(Starred: Map[String, Boolean], University: Map[String, Boolean], Department: Map[String, Boolean])
 
 class Gradsearch(val db: Database) extends GradsearchStack
-  with JacksonJsonSupport with DbRoutes with AuthenticationSupport {
+  with JacksonJsonSupport with DbRoutes with LoginRegisterRoutes with AuthenticationSupport {
   // Sets up automatic case class to JSON output serialization, required by
   // the JValueResult trait.
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -41,100 +41,17 @@ class Gradsearch(val db: Database) extends GradsearchStack
     contentType = formats("json")
   }
 
-  get("/auth-test") {
-    loginAuth
-    <html>
-      <body>
-        <h1>Hello from Scalatra</h1>
-        <p>You are authenticated.</p>
-      </body>
-    </html>
+  def getCurrentUserEmail = {
+    userOption match {
+      case Some(currentUser) => currentUser.email
+      case None => ""
+    }
   }
 
   // Website routes
   get("/") {
     contentType="text/html"
     ssp("/home", "userEmail" -> getCurrentUserEmail)
-  }
-
-  get("/login") {
-    contentType="text/html"
-    val failed = (params.get("failed") == Some("true"))
-    ssp("/login", "failed" -> failed)
-  }
-
-  post("/login") {
-    loginAuth
-    redirect("/")
-  }
-
-  get("/create-anon-user") {
-    anonUserAuth
-    redirect("/")
-  }
-
-  post("/register") {
-    db withDynSession {
-
-      // TODO: Pull this logic into a separate function
-      val usernameOpt = params.get("username")
-      val passwordOpt = params.get("password")
-      val passwordRepeatOpt = params.get("passwordRepeat")
-
-      // Find errors or success
-      val UserInfoOrError = (usernameOpt, passwordOpt, passwordRepeatOpt) match {
-        case (Some(username), Some(password), Some(passwordRepeat)) => {
-          lazy val existingUser = users.filter(_.email === username).firstOption
-          if (passwordRepeat != password) {
-            Left("Passwords don't match")
-          } else if (existingUser != None) {
-            Left("User with that email already exists")
-          } else {
-            Right((username, password))
-          }
-        }
-        case _ => Left("Please fill in all fields")
-      }
-
-      UserInfoOrError match {
-        case Left(error) => {
-          contentType = "text/html"
-          ssp("/login", "error" -> error)
-        }
-        case Right((username, password)) => {
-
-          // If anon user, update
-          userOption match {
-
-            // Upgrade anon user to real user
-            case Some(currentUser) if currentUser.anonymous => {
-
-              println("ALREADY logged in as anonymous user")
-              val u = users.filter(_.id === currentUser.id).map {
-                uu => (uu.email, uu.passwordHash, uu.anonymous)
-              }
-              u.update(username, User.hashPassword(password), false)
-            }
-
-            // They're already logged in as a full user.
-            // TODO: Throw an error or something
-            case Some(currentUser) => {
-              println("ALREADY logged in as FULL user")
-            }
-
-            // No current user: Create new user + log in
-            case _ => {
-              println("Not logged in yet; creating new user")
-              users insert User.createUser(username, password)
-              loginAuth
-            }
-          }
-
-          // TODO: Where should we redirect to?
-          redirect("/")
-        }
-      }
-    }
   }
 
   get("/search") {
@@ -160,7 +77,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   get("/about") {
     contentType="text/html"
 
-implicit val formats = Serialization.formats(NoTypeHints)
+    implicit val formats = Serialization.formats(NoTypeHints)
     db withDynSession {
       val schoolCounts = professors.groupBy(_.school).map { case (school, profs) => (school, profs.length)}
       val numSchools = professors.map(_.school).countDistinct.run
@@ -172,16 +89,6 @@ implicit val formats = Serialization.formats(NoTypeHints)
         "numDepts" -> numDepts,
         "sortedSchools" -> sortedSchools
       )
-    }
-  }
-
-  // TODO: move this somewhere better (some util function?)
-  def getCurrentUser = userOption
-
-  def getCurrentUserEmail = {
-    userOption match {
-      case Some(currentUser) => currentUser.email
-      case None => ""
     }
   }
 
@@ -259,13 +166,11 @@ implicit val formats = Serialization.formats(NoTypeHints)
       val deptFilter = multiParams("Department")
       val start = params.getOrElse("start", "0").toInt
 
-      val currentUser = getCurrentUser
-
       def schoolFilterFunc(prof: Professor):Boolean = schoolFilter.isEmpty || schoolFilter.contains(prof.school)
       def deptFilterFunc(prof: Professor):Boolean = deptFilter.isEmpty || deptFilter.contains(prof.department)
 
       // Get professors who match search string, plus their keywords
-      val professorResults = getProfessors(searchString, starredFilter, currentUser)
+      val professorResults = getProfessors(searchString, starredFilter, userOption)
 
       // Get counts for all possible filters
       type ProfFilter = WebProfessor => Boolean
@@ -287,6 +192,51 @@ implicit val formats = Serialization.formats(NoTypeHints)
       val filteredProfs = professorResults.filter(prof => matchesFilters(prof, allFilters))
 
       Results(filteredProfs.view.drop(start).take(12), List(uniCounts, deptCounts, starCounts), filteredProfs.length)
+    }
+  }
+
+  get("/starred-search") {
+    val searchString = params("searchString")
+    println(searchString)
+    userOption match {
+      case Some(currentUser) => {
+        db withDynSession {
+          println(f"In /starred-search")
+          val existingSearch = starredSearches.filter(
+            pair => (pair.searchString === searchString && pair.userId === currentUser.id.get))
+          existingSearch.length.run > 0
+        }
+      }
+      case None => false
+    }
+  }
+
+  post("/star-search") {
+    // If current user is None, make anonymous user so we can save the user's data
+    if (!userOption.isDefined) {
+      anonUserAuth
+    }
+
+    userOption.foreach { currentUser =>
+      db withDynSession {
+        // Add or remove prof-user pair to db
+        val searchString = params("searchString")
+        val starred = params("starred").toBoolean
+        val userId = currentUser.id.get
+        println(f"Setting starred ${searchString}, ${starred}")
+        val existingSearch = starredSearches.filter(
+          pair => (pair.searchString === searchString && pair.userId === userId))
+        val pairExists = (existingSearch.length.run > 0)
+        println(f"Exists: ${pairExists}")
+
+        if (starred && !pairExists) {
+          // We need to put this pair in the db
+          starredSearches insert (userId, searchString)
+        } else if (!starred && pairExists) {
+          // We need to remove this pair from the db
+          existingSearch.delete
+        }
+      }
     }
   }
 
