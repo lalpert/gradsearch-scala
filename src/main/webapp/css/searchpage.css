@@ -117,6 +117,24 @@ footer {
   min-height: 122px;
 }
 
+.anonalert-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.anonalert-enter.anonalert-enter-active {
+  opacity: 1;
+}
+
+.anonalert-leave {
+  opacity: 1;
+  transition: opacity .4s ease-in;
+}
+
+.anonalert-leave.anonalert-leave-active {
+  opacity: 0.01;
+}
+
  /*
   * Off Canvas
   * --------------------------------------------------

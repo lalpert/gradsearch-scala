@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
 /**
  * The entire search page
  * Holds state for the whole page, including the list of all profs matching the search term and the currently selected
@@ -9,7 +11,8 @@ var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string.isRequired,
     filters: React.PropTypes.object.isRequired,
-    loggedIn: React.PropTypes.bool.isRequired
+    loggedIn: React.PropTypes.bool.isRequired,
+    isFullUser: React.PropTypes.bool.isRequired,
   },
 
   getInitialState: function() {
@@ -48,8 +51,7 @@ var SearchPage = React.createClass({
       // List of searches the user has starred before
 
       // The number of professors we've starred by clicking on them on the client side.
-      clientSideStarredCount: 0
-
+      clientSideStarredCount: 0,
     }
   },
 
@@ -156,21 +158,36 @@ var SearchPage = React.createClass({
 
   setStarred: function(profId, starred) {
     // Instantly update the starred variables on the client
-    if (!this.props.loggedIn) {
-      // TODO: implement anonymous users, or something
-      console.log("Can't star. You need to login.");
-      return;
-    }
     var prof = this.findProf(profId);
     if (prof.starred != starred) {
         prof.starred = starred;
+
         var diff = starred ? 1 : -1;
-        this.setState({visibleProfs: this.state.visibleProfs, clientSideStarredCount: this.state.clientSideStarredCount + diff});
+        var newClientCount =  this.state.clientSideStarredCount + diff;
+
+        this.setState({
+          // We altered visibleProfs, so explicitly re-set it here
+          visibleProfs: this.state.visibleProfs,
+          clientSideStarredCount: newClientCount
+        });
+
+        // If they are not logged in and have never hidden the anon user alert, show alert
+        var alertHidden = $.cookie('anonAlert') === "hide";
+        if (!this.props.isFullUser && !alertHidden) {
+          $.cookie('anonAlert', 'show');
+        }
+
         // Send the starred info to the server
         $.post("/star-prof", {profId: profId, starred: starred});
     } else {
         console.warn("Called starred on a professor that was already starred");
     }
+  },
+
+  closeAlert: function() {
+    $.cookie('anonAlert', 'hide');
+    // Trigger a reload
+    this.setState({});
   },
 
   setSearchStarred: function(starred) {
@@ -182,6 +199,11 @@ var SearchPage = React.createClass({
     var currentProf = this.findProf(this.state.currentProfID);
     var numStarredClientSide = this.state.clientSideStarredCount;
     var starImg = "gray_star.png"; //this.props.search.starred ? "gold_star.png" : "gray_star.png";
+
+    var anonAlertDiv = "";
+    if ($.cookie('anonAlert') == 'show') {
+      anonAlertDiv = <AnonUserAlert key="anonalert" closeAlert={this.closeAlert}/>
+    }
 
     return (
       <div className="search-container">
@@ -205,6 +227,11 @@ var SearchPage = React.createClass({
         </div>
 
         <div className="col-sm-9">
+
+          <ReactCSSTransitionGroup transitionName="anonalert">
+            {anonAlertDiv}
+          </ReactCSSTransitionGroup>
+
           <div className="alert alert-info search-string-div" role="alert">
             {this.getSearchString()}
             <div className="search-text-div">
@@ -229,3 +256,20 @@ var SearchPage = React.createClass({
     this.getProfs();
   },
  });
+
+var AnonUserAlert = React.createClass({
+  propTypes: {
+    closeAlert: React.PropTypes.func
+  },
+
+  render: function() {
+    return <div className="alert alert-warning alert-dismissible search-string-div" role="alert">
+      <button type="button" className="close" onClick={this.props.closeAlert}>
+        <span aria-hidden="true">&times;</span>
+        <span className="sr-only">Close</span>
+      </button>
+      Nice, you starred your first professor! Be sure to <a href="/login">log in</a> so your stars will be
+      saved when you come back - otherwise, they'll be reset when you close the browser.
+    </div>;
+  }
+});
