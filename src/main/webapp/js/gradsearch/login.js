@@ -2,33 +2,32 @@
 var Login = React.createClass({
 
   getInitialState: function() {
-  	return {username: "", password: "", passwordRepeat: "", valid: false};
+  	return {username: "", password: "", passwordRepeat: "", usernameValid: false};
   },
 
   updateState: function(name, value) {
-  	var state = this.state;
-  	state[name] = value; 	 	
-  	this.updateIsValid(state); 
-  	this.setState(state);
+  	var d = {};
+  	d[name] = value;
+  	this.setState(d);
   },
 
-  updateIsValid: function(state) {
-  	if (this.usernameValidator(state["username"]) == "" && 
-  			this.passwordValidator(state["password"]) == "" && 
-  			this.passwordRepeatValidator(state["passwordRepeat"]) == "") {
-  		state["valid"] = true;
-  	} else {
-  		state["valid"] = false;
-  	}
+  isValid: function() {
+  	return (this.state.usernameValid && 
+  			this.passwordValidator(this.state["password"]) == "" && 
+  			this.passwordRepeatValidator(this.state["passwordRepeat"]) == "" );
   },
 
   // TODO: add username checking + the ability to do affirmative
-  usernameValidator: function(username) {
+  usernameValidator: function(username, callback) {
+  	var self = this;
   	$.get("/is-available?username=" + username, function(data) {
   		if (data == false) {
-  			return "Sorry, that email is already in use";
+  			self.setState({"usernameValid": false});
+  			callback("Sorry, that email is already in use");
+  	
   		} else {
-  			return "";
+  			self.setState({"usernameValid": true});
+  			callback("");
   		}
   	});
   },
@@ -50,6 +49,7 @@ var Login = React.createClass({
   },
 
   render: function() {
+  	var valid = this.isValid();
     return (
       <div>
 	      <Validator name="username" placeholder="Email Address" type="text"
@@ -58,7 +58,7 @@ var Login = React.createClass({
 	      	onBlurValidator={this.passwordValidator} updateHandler={this.updateState}/>
 	      <Validator name="passwordRepeat" type="password" className="form-control" placeholder="Re-enter password" required 
 	      	onKeyUpValidator={this.passwordRepeatValidator} updateHandler={this.updateState}/>
-	      <button className="btn btn-lg btn-primary btn-block" type="submit" disabled={!this.state.valid}>Create account</button>
+	      <button className="btn btn-lg btn-primary btn-block" type="submit" disabled={!valid}>Create account</button>
       </div>
     );
   }
@@ -77,20 +77,22 @@ var Validator = React.createClass({
 	},
 
 	handleChange: function(event) {
-		var validationMessage = "";
-		if (this.props.onKeyUpValidator) {
-			validationMessage = this.props.onKeyUpValidator(event.target.value);
-		}
 		if (this.props.updateHandler) {
 			this.props.updateHandler(this.props.name, event.target.value);
 		}
-		this.setState({value: event.target.value, validationMessage: validationMessage});
+		if (this.props.onKeyUpValidator) {
+			var validationMessage = this.props.onKeyUpValidator(event.target.value);
+			this.setState({validationMessage: validationMessage});
+		}
+		this.setState({value: event.target.value});
 	},
 
 	handleBlur: function(event) {
+		var self = this;
 		if (this.props.onBlurValidator) {
-			var validationMessage = this.props.onBlurValidator(this.state.value);
-			this.setState({value: this.state.value, validationMessage: validationMessage});
+			this.props.onBlurValidator(this.state.value, function(validationMessage) {
+				self.setState({value: self.state.value, validationMessage: validationMessage});
+			});
 		}
 	},
 
