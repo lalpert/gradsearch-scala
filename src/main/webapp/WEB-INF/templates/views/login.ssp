@@ -22,14 +22,21 @@ Login/Register
 </div>
 
 <div class="register-div">
-  <form class="form-signin" role="form" action="/register" method="post">
+  <form class="form-signin" role="form" action="/register" method="post" id="register">
     <h2 class="form-signin-heading">Create an account</h2>
-    <input name="username" type="text" class="form-control" placeholder="Email address" required autofocus>
-    <input name="password" type="password" class="form-control" placeholder="Password" required>
-    <input name="passwordRepeat" type="password" class="form-control" placeholder="Re-enter password" required>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+    <div id="login-inputs">
+
+    </div>
   </form>
 </div>
 
 
 </div> <!-- /container -->
+<script type="text/jsx" src="/js/gradsearch/login.js"></script>
+<script type="text/jsx">
+/** @jsx React.DOM */
+React.renderComponent(
+    <Login/>,
+    document.getElementById('login-inputs')
+);
+</script>
