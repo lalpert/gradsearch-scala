@@ -1,0 +1,24 @@
+# Create a new user
+adduser gradsearch
+
+# Give that user SUDO permissions
+sudo vim /etc/sudoers
+
+# Install the default jre:
+sudo apt-get install default-jre
+
+# Install tomcat
+sudo apt-get install tomcat7
+
+# Install mysql
+sudo apt-get install mysql-server
+
+# Set password as appropriate
+
+# Fix the source of randomness for tomcat so it doesn't take 5 minutes to start
+
+# Set AUTHBIND=yes in /etc/defaults/tomcat7
+
+sudo touch /etc/authbind/byport/80
+sudo chmod 500 /etc/authbind/byport/80
+sudo chown tomcat7 /etc/authbind/byport/80
