@@ -6,6 +6,8 @@
 <html>
 <head>
   <title>re:search | ${title}</title>
+  <meta name="viewport" content="width=device-width"/>
+  
   <script src="/js/react/react-with-addons.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
   <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
