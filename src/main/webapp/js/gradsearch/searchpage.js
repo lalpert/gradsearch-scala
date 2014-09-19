@@ -7,6 +7,17 @@ var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
  * Holds state for the whole page, including the list of all profs matching the search term and the currently selected
  * filters.
  */
+
+ // Here is the simplest possible mixin to get a global scroll event
+var PageScrollMixin = {
+    componentDidMount: function() {
+        window.addEventListener('scroll', this.onScroll, false);
+    },
+    componentWillUnmount: function() {
+        window.removeEventListener('scroll', this.onScroll, false);
+    }
+};
+
 var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string.isRequired,
@@ -14,6 +25,8 @@ var SearchPage = React.createClass({
     loggedIn: React.PropTypes.bool.isRequired,
     isFullUser: React.PropTypes.bool.isRequired,
   },
+
+  mixins: [PageScrollMixin],
 
   getInitialState: function() {
     return {
@@ -55,13 +68,20 @@ var SearchPage = React.createClass({
       // Whether the current search has been starred by the user.
       // Fetched through ajax, then can be changed client-side.
       isSearchStarred: false,
+
+      // Whether we are actively loading more professors
+      loadingMoreProfessors: false,
+
     }
   },
 
  /*
   * Use the currently selected filters in this.state to build a URL for this search
   */
-  buildUrlParams: function() {
+  buildUrlParams: function(start) {
+    if (start == undefined) {
+      start = 0;
+    }
     var url = "q=" + encodeURIComponent(this.props.searchString);
     _.each(this.state.selectedFilters, function(filterVals, filterName) {
       _.each(filterVals, function(checked, name) {
@@ -70,21 +90,32 @@ var SearchPage = React.createClass({
         }
       });
     });
-    return url;
+    return url + "&start=" + start;
   },
 
  /*
   * Fetch professors who match the current search + filters. Update state accordingly.
   */
-  getProfs: function() {
+  getProfs: function(concat) {
+    console.log("loading profs");
+    if (this.state.loadingMoreProfessors || 
+      (this.state.visibleProfs.length == this.state.totalProfessors && concat == true)) {
+      return;
+    }
+    this.setState({loadingMoreProfessors: true});
+    var offset = concat ? this.state.visibleProfs.length + 1 : 0;
+  
     var self = this;
-    var url = "/results?" + this.buildUrlParams();
+    var url = "/results?" + this.buildUrlParams(offset);
     var jqxhr = $.get(url, function(data) {
+      var profs = concat ? self.state.visibleProfs.concat(data.professors) : data.professors;
+     
       self.setState({
-        visibleProfs: data.professors,
+        visibleProfs: profs,
         filterOptions: data.counts,
         totalProfessors: data.totalProfessors,
-        clientSideStarredCount: 0
+        clientSideStarredCount: 0,
+        loadingMoreProfessors: false
       });
     });
   },
@@ -130,7 +161,7 @@ var SearchPage = React.createClass({
     var newUrl = "/search?" + this.buildUrlParams();
     window.history.pushState("", "", newUrl);
     // Get the professors matching the new filters
-    this.getProfs();
+    this.getProfs(false);
     this.getSearchStarred();
   },
 
@@ -223,6 +254,12 @@ var SearchPage = React.createClass({
        searchString: this.buildUrlParams(),
        starred: starred
      });
+  },
+
+  onScroll: function(scroll) {
+    if($(window).scrollTop()+window.innerHeight + 300 > $(document).height()) {
+      this.getProfs(true);  
+    }
   },
 
   render: function() {
