@@ -5,25 +5,25 @@ re:search
 <link href="/css/home.css" rel="stylesheet">
 #end
 
-<div id="container">
-<div class="jumbotron over-image search-container">
-    <h1 class="over-image">re:search</h1>
-    <p class="over-image">What are you interested in?</p>
-	<p class="over-image">For example: <a href="/search?q=robotics">robotics</a>, 
-	    <a href="/search?q=systems biology">systems biology</a>
-	</p>
-	<form class="form-inline" role="form" action="search">
-	  <div class="form-group form-group-">
-	    <label class="sr-only" for="lab">What are you interested in?</label>
-	    <input name="q" class="form-control input-sm search-box" placeholder="">
-	  </div>
-	  <button type="submit" class="search-button btn btn-primary btn-sm">Go</button>
-	</form>
-</div>
 
-<!--<script type="text/jsx">
-/** @jsx React.DOM */
-React.renderComponent(
-    <HelloWorld name="Russell"/>, document.getElementById('container')
-);
-</script>-->
+<div class="jumbotron homepage-jumbotron">
+  <h1 class="over-image">re:search</h1>
+  <p class="over-image">What are you interested in?</p>
+
+  <p class="over-image">For example:
+    <a href="/search?q=robotics">robotics</a>,
+    <a href="/search?q=systems biology">systems biology</a>
+  </p>
+
+  <form class="form-inline" role="form" action="search">
+    <div class="form-group form-group-">
+      <label class="sr-only" for="lab">What are you interested in?</label>
+      <input name="q" class="form-control input-sm search-box" placeholder="">
+    </div>
+    <button type="submit" class="search-button btn btn-primary btn-sm">Go</button>
+  </form>
+
+  <p class="over-image">Re:search helps you find professors who share your research interests.
+     Enter a research interest, department, or professor's name to get started.
+  </p>
+</div>
