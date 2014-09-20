@@ -124,6 +124,10 @@ class Gradsearch(val db: Database) extends GradsearchStack
         sp <- starredProfessors if sp.profId === p.id && sp.userId === currentUser.id.get
       } yield p
 
+      // If there's no user and they clicked starred, there aren't going to be any results.
+      // Return a query we know is empty!
+      case (true, _) => professors.filter(_.id === -1)
+
       case _ => professorQuery
     }
 
