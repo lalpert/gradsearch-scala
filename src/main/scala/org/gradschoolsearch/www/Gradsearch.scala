@@ -51,7 +51,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   // Website routes
   get("/") {
     contentType="text/html"
-    ssp("/home", "userEmail" -> getCurrentUserEmail)
+    ssp("/home", "userEmail" -> getCurrentUserEmail, "currentPage" -> "home")
   }
 
   get("/search") {
@@ -65,7 +65,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
     val deptFilter = multiParams("Department")
 
     def toMap(params: Seq[String]): Map[String, Boolean] = params.map(p => (p, true)).toMap
-    ssp("/search", 
+    ssp("/search",
+      "currentPage" -> "search",
       "search" -> searchString, 
       "userEmail" -> getCurrentUserEmail, 
       "loggedIn" -> userOption.isDefined,
@@ -84,6 +85,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val numDepts = professors.map(_.department).countDistinct.run
       val sortedSchools = schoolCounts.sortBy(_._2).map(_._1).run.toList
       ssp("/about",
+        "currentPage" -> "about",
         "numProfs" -> professors.length.run,
         "numSchools" -> numSchools,
         "numDepts" -> numDepts,
@@ -213,7 +215,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       case _ => Seq()
     }
 
-    ssp("/starredSearches", "starredSearches" -> write(starred))
+    ssp("/starredSearches", "starredSearches" -> write(starred), "currentPage" -> "starredSearches")
   }
 
   get("/starred-search") {
