@@ -5,9 +5,10 @@
  */
 var SearchInfoFromFilters = React.createClass({
   propTypes: {
-    numProfs: React.PropTypes.number,
-    filters: React.PropTypes.object,
-    searchString: React.PropTypes.string,
+    numProfs: React.PropTypes.number.isRequired,
+    filters: React.PropTypes.object.isRequired,
+    searchString: React.PropTypes.string.isRequired,
+    loading: React.PropTypes.bool.isRequired
   },
 
   getOptions: function(filterName) {
@@ -25,6 +26,7 @@ var SearchInfoFromFilters = React.createClass({
       uniOptions={this.getOptions("University")}
       deptOptions={this.getOptions("Department")}
       searchString={this.props.searchString}
+      loading={this.props.loading}
     />)
   }
 });
@@ -39,6 +41,7 @@ var SearchInfoBuilder = React.createClass({
     uniOptions: React.PropTypes.array,
     deptOptions: React.PropTypes.array,
     searchString: React.PropTypes.string,
+    loading: React.PropTypes.bool
   },
 
   // Make a segment like "at 2 universities" from filter info
@@ -70,7 +73,11 @@ var SearchInfoBuilder = React.createClass({
 
   render: function() {
     var description = this.makeSearchString();
-    return this.transferPropsTo(<SearchInfo description={description}/>)
+    if (this.props.loading && this.props.numProfs == 0) {
+      return this.transferPropsTo(<SearchInfo description="Loading..."/>);
+    } else {
+      return this.transferPropsTo(<SearchInfo description={description}/>);
+    }
   }
 });
 

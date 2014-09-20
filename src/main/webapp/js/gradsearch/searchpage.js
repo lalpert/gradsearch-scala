@@ -269,7 +269,7 @@ var SearchPage = React.createClass({
     var visibleProfs = this.state.visibleProfs;
     var currentProf = this.findProf(this.state.currentProfID);
     var numStarredClientSide = this.state.clientSideStarredCount;
-
+    var loading = this.state.loadingMoreProfessors;
     var anonAlertDiv = "";
     if ($.cookie('anonAlert') == 'show') {
       anonAlertDiv = <AnonUserAlert key="anonalert" closeAlert={this.closeAlert}/>
@@ -308,6 +308,7 @@ var SearchPage = React.createClass({
             searchString={this.props.searchString}
             starred={this.state.isSearchStarred}
             setSearchStarred={this.setSearchStarred}
+            loading={loading}
           />
 
           <ProfSection
