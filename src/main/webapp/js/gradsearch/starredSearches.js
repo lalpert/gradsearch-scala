@@ -41,9 +41,12 @@ var StarredSearchPage = React.createClass({
       />;
     });
 
+    var emptyMessage = <p>You have no saved searches. Star a search to save it!</p>
+    var contents = this.props.starredSearches.length > 0 ? searches : emptyMessage;
+
     return <div className="container">
       <h2>Your starred searches</h2>
-      {searches}
+      {contents}
     </div>;
   }
 });

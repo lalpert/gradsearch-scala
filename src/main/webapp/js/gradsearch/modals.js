@@ -51,12 +51,15 @@ var ModalDiv = React.createClass({
       return <div/>;
     }
 
+    var starImg = this.props.currentProf.starred ? "gold_star.png" : "gray_star.png";
+
     return <div className="modal fade" id="profModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div className="modal-dialog" onKeyPress={this.hello}>
         <div className="modal-content">
           <div className="modal-header">
             <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
             <h4 className="modal-title" id="myModalLabel">{this.props.currentProf.name}</h4>
+
           </div>
           <div className="modal-body prof-modal-body">
             <div className="modal-above-fold">
