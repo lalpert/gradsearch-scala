@@ -293,4 +293,9 @@ class Gradsearch(val db: Database) extends GradsearchStack
       }
     }
   }
+
+  notFound {
+    contentType = "text/html"
+    <h1>Move along. Nothing to see here.</h1>
+  }
 }
