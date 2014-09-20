@@ -15,6 +15,13 @@ See it in action at [gradschoolsearch.org](http://www.gradschoolsearch.org)
 
 Professor data was scraped from university websites. We're in the process of updating our data and scraping tools.
 
+## Contributing ##
+
+We'd love help with:
+* Building new features. Take a look at [the current issues](https://github.com/lalpert/gradsearch-scala/issues) to see things we know are missing.
+* Scrape data. We load data in a pretty straightforward JSON format. Ping us personally if you want more info.
+* File an issue. If it's broken or something you want to see, let us know!
+
 ## Build & Run ##
 Re:search requires a locally running mysql. Install mysql onto your local system for running gradsearch. Use the Scala build tool (sbt) to run Re:search locally. Using JRebel significantly improves sbt reload times.
 
