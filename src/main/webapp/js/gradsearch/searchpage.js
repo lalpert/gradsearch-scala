@@ -97,7 +97,6 @@ var SearchPage = React.createClass({
   * Fetch professors who match the current search + filters. Update state accordingly.
   */
   getProfs: function(concat) {
-    console.log("loading profs");
     if (this.state.loadingMoreProfessors || 
       (this.state.visibleProfs.length == this.state.totalProfessors && concat == true)) {
       return;
@@ -178,12 +177,16 @@ var SearchPage = React.createClass({
     return _.findWhere(this.state.visibleProfs, {id: profId});
   },
 
+  getCurrentProfIndex: function() {
+    var profIds = _.pluck(this.state.visibleProfs, "id");
+    return  _.indexOf(profIds, this.state.currentProfID);
+  },
+
   showNextProf: function(direction) {
     var profIds = _.pluck(this.state.visibleProfs, "id");
-    var currentIndex = _.indexOf(profIds, this.state.currentProfID);
-
+    var currentIndex = this.getCurrentProfIndex();
     if (direction == "next") {
-      if (currentIndex < profIds.length - 1) {
+      if (currentIndex < this.state.visibleProfs.length - 1) {
         this.setState({currentProfID: profIds[currentIndex + 1]})
       }
     } else {
@@ -257,7 +260,7 @@ var SearchPage = React.createClass({
   },
 
   onScroll: function(scroll) {
-    if($(window).scrollTop()+window.innerHeight + 300 > $(document).height()) {
+    if($(window).scrollTop() + window.innerHeight + 300 > $(document).height()) {
       this.getProfs(true);  
     }
   },
@@ -323,6 +326,15 @@ var SearchPage = React.createClass({
     this.getProfs();
     this.getSearchStarred();
   },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    if (this.state.currentProfID != prevState.currentProfID) {
+      var currentIndex = this.getCurrentProfIndex();
+      if (this.state.visibleProfs.length - currentIndex < 3) {
+        this.getProfs(true);
+      }
+    }
+  }
  });
 
 
