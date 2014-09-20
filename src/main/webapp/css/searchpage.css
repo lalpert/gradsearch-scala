@@ -117,6 +117,15 @@ footer {
   min-height: 122px;
 }
 
+.modal-div .modal-header {
+min-height: 56px;
+}
+
+.modal-title {
+float:left;
+}
+
+
 .anonalert-enter {
   opacity: 0.01;
   transition: opacity .5s ease-in;
