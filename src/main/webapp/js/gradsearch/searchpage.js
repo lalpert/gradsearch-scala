@@ -7,6 +7,17 @@ var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
  * Holds state for the whole page, including the list of all profs matching the search term and the currently selected
  * filters.
  */
+
+ // Here is the simplest possible mixin to get a global scroll event
+var PageScrollMixin = {
+    componentDidMount: function() {
+        window.addEventListener('scroll', this.onScroll, false);
+    },
+    componentWillUnmount: function() {
+        window.removeEventListener('scroll', this.onScroll, false);
+    }
+};
+
 var SearchPage = React.createClass({
   propTypes: {
     searchString: React.PropTypes.string.isRequired,
@@ -14,6 +25,8 @@ var SearchPage = React.createClass({
     loggedIn: React.PropTypes.bool.isRequired,
     isFullUser: React.PropTypes.bool.isRequired,
   },
+
+  mixins: [PageScrollMixin],
 
   getInitialState: function() {
     return {
@@ -55,13 +68,20 @@ var SearchPage = React.createClass({
       // Whether the current search has been starred by the user.
       // Fetched through ajax, then can be changed client-side.
       isSearchStarred: false,
+
+      // Whether we are actively loading more professors
+      loadingMoreProfessors: false,
+
     }
   },
 
  /*
   * Use the currently selected filters in this.state to build a URL for this search
   */
-  buildUrlParams: function() {
+  buildUrlParams: function(start) {
+    if (start == undefined) {
+      start = 0;
+    }
     var url = "q=" + encodeURIComponent(this.props.searchString);
     _.each(this.state.selectedFilters, function(filterVals, filterName) {
       _.each(filterVals, function(checked, name) {
@@ -70,21 +90,31 @@ var SearchPage = React.createClass({
         }
       });
     });
-    return url;
+    return url + "&start=" + start;
   },
 
  /*
   * Fetch professors who match the current search + filters. Update state accordingly.
   */
-  getProfs: function() {
+  getProfs: function(concat) {
+    if (this.state.loadingMoreProfessors || 
+      (this.state.visibleProfs.length == this.state.totalProfessors && concat == true)) {
+      return;
+    }
+    this.setState({loadingMoreProfessors: true});
+    var offset = concat ? this.state.visibleProfs.length + 1 : 0;
+  
     var self = this;
-    var url = "/results?" + this.buildUrlParams();
+    var url = "/results?" + this.buildUrlParams(offset);
     var jqxhr = $.get(url, function(data) {
+      var profs = concat ? self.state.visibleProfs.concat(data.professors) : data.professors;
+     
       self.setState({
-        visibleProfs: data.professors,
+        visibleProfs: profs,
         filterOptions: data.counts,
         totalProfessors: data.totalProfessors,
-        clientSideStarredCount: 0
+        clientSideStarredCount: 0,
+        loadingMoreProfessors: false
       });
     });
   },
@@ -130,7 +160,7 @@ var SearchPage = React.createClass({
     var newUrl = "/search?" + this.buildUrlParams();
     window.history.pushState("", "", newUrl);
     // Get the professors matching the new filters
-    this.getProfs();
+    this.getProfs(false);
     this.getSearchStarred();
   },
 
@@ -147,12 +177,16 @@ var SearchPage = React.createClass({
     return _.findWhere(this.state.visibleProfs, {id: profId});
   },
 
+  getCurrentProfIndex: function() {
+    var profIds = _.pluck(this.state.visibleProfs, "id");
+    return  _.indexOf(profIds, this.state.currentProfID);
+  },
+
   showNextProf: function(direction) {
     var profIds = _.pluck(this.state.visibleProfs, "id");
-    var currentIndex = _.indexOf(profIds, this.state.currentProfID);
-
+    var currentIndex = this.getCurrentProfIndex();
     if (direction == "next") {
-      if (currentIndex < profIds.length - 1) {
+      if (currentIndex < this.state.visibleProfs.length - 1) {
         this.setState({currentProfID: profIds[currentIndex + 1]})
       }
     } else {
@@ -225,6 +259,12 @@ var SearchPage = React.createClass({
      });
   },
 
+  onScroll: function(scroll) {
+    if($(window).scrollTop() + window.innerHeight + 300 > $(document).height()) {
+      this.getProfs(true);  
+    }
+  },
+
   render: function() {
     var visibleProfs = this.state.visibleProfs;
     var currentProf = this.findProf(this.state.currentProfID);
@@ -286,6 +326,15 @@ var SearchPage = React.createClass({
     this.getProfs();
     this.getSearchStarred();
   },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    if (this.state.currentProfID != prevState.currentProfID) {
+      var currentIndex = this.getCurrentProfIndex();
+      if (this.state.visibleProfs.length - currentIndex < 3) {
+        this.getProfs(true);
+      }
+    }
+  }
  });
 
 

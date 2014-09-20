@@ -11,13 +11,10 @@ var SearchInfoFromFilters = React.createClass({
   },
 
   getOptions: function(filterName) {
-    console.log(filterName);
     var filter = this.props.filters[filterName];
-    console.log(filter);
     var options = _.filter(_.keys(filter), function(opt) {
        return filter[opt];
     });
-    console.log(options);
     return options;
   },
 
@@ -57,13 +54,12 @@ var SearchInfoBuilder = React.createClass({
 
   // Make search string from # profs...
   makeSearchString: function() {
-   console.log("ss", this.props.searchString);
     var profString = this.props.numProfs == 1 ? " professor " : " professors ";
     var starredString = _.contains(this.props.starredOptions, "Starred") ? " starred" : "";
     var uniString = this.buildStringSegment(this.props.uniOptions, "at", "universities")
     var deptString = this.buildStringSegment(this.props.deptOptions, "in", "departments")
     var researchString = this.props.searchString.length > 0 ? "researching " : "";
-      console.log("rs", researchString);
+
     var str = this.props.numProfs + starredString + profString + researchString + this.props.searchString +
         uniString + deptString;
     // Strip whitespace
