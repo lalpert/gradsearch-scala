@@ -11,8 +11,9 @@ body {
 }
 
 .homepage-jumbotron {
- max-width: 504px;
+ max-width: 525px;
  margin-left: 20px;
+ margin-top: 30px;
  background-color: transparent;
 }
 
