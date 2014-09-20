@@ -1,5 +1,5 @@
-html { 
-  background: url(/images/home2-nodark-sat.jpg) no-repeat center center fixed; 
+html {
+  background: url(/images/home2-nodark-sat.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -10,10 +10,24 @@ body {
 	background-color: transparent;
 }
 
+.homepage-jumbotron {
+ max-width: 504px;
+ margin-left: 20px;
+ background-color: transparent;
+}
+
+.homepage-jumbotron h1 {
+  color: white;
+}
+
+.homepage-jumbotron .form-group {
+  display: inline-block;
+}
+
 .over-image {
 	background-color: transparent;
 	color: white;
-	text-shadow: rgba(0, 0, 0, 0.329412) 2px 2px;
+	/*text-shadow: rgba(0, 0, 0, 0.329412) 2px 2px;*/
 }
 
 .search-box {
