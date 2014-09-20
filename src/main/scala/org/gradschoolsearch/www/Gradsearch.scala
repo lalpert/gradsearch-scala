@@ -295,7 +295,12 @@ class Gradsearch(val db: Database) extends GradsearchStack
   }
 
   notFound {
-    contentType = "text/html"
-    <h1>Move along. Nothing to see here.</h1>
+    findTemplate(requestPath) map { path =>
+      contentType = "text/html"
+      layoutTemplate(path)
+    } orElse serveStaticResource() getOrElse {
+      contentType = "text/html"
+      <h1>Move along. Nothing to see here</h1>
+    }
   }
 }
