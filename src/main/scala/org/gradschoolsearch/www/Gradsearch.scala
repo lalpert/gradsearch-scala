@@ -51,7 +51,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   // Website routes
   get("/") {
     contentType="text/html"
-    ssp("/home", "userEmail" -> getCurrentUserEmail)
+    ssp("/home", "userEmail" -> getCurrentUserEmail, "currentPage" -> "home")
   }
 
   get("/search") {
@@ -65,7 +65,8 @@ class Gradsearch(val db: Database) extends GradsearchStack
     val deptFilter = multiParams("Department")
 
     def toMap(params: Seq[String]): Map[String, Boolean] = params.map(p => (p, true)).toMap
-    ssp("/search", 
+    ssp("/search",
+      "currentPage" -> "search",
       "search" -> searchString, 
       "userEmail" -> getCurrentUserEmail, 
       "loggedIn" -> userOption.isDefined,
@@ -84,6 +85,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val numDepts = professors.map(_.department).countDistinct.run
       val sortedSchools = schoolCounts.sortBy(_._2).map(_._1).run.toList
       ssp("/about",
+        "currentPage" -> "about",
         "numProfs" -> professors.length.run,
         "numSchools" -> numSchools,
         "numDepts" -> numDepts,
@@ -121,6 +123,10 @@ class Gradsearch(val db: Database) extends GradsearchStack
         p <- professorQuery
         sp <- starredProfessors if sp.profId === p.id && sp.userId === currentUser.id.get
       } yield p
+
+      // If there's no user and they clicked starred, there aren't going to be any results.
+      // Return a query we know is empty!
+      case (true, _) => professors.filter(_.id === -1)
 
       case _ => professorQuery
     }
@@ -213,7 +219,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       case _ => Seq()
     }
 
-    ssp("/starredSearches", "starredSearches" -> write(starred))
+    ssp("/starredSearches", "starredSearches" -> write(starred), "currentPage" -> "starredSearches")
   }
 
   get("/starred-search") {

@@ -25,7 +25,8 @@ About
         including a research summary, awards, and publications. If you register for the site, you can bookmark
         professors and save searches to view later.
     </p>
-
+    <hr/>
+    
     <h1>The Stats</h1>
     <h3>${numProfs} Professors</h3>
     <h3>${numSchools} Schools</h3>
@@ -40,12 +41,17 @@ About
         <li>Biology</li>
         <li>And not too many more (but more are coming soon!)</li>
     </ul>
+    <hr/>
 
     <h1>Contact Us</h1>
     For questions or comments, contact us at russell.r.cohen AT gmail or leah.alpert AT gmail.
+    <hr/>
 
-    <h1>Home Page Image Credit</h1>
+    <h1>Image Credits</h1>
     Homepage image by Anastas Tarpanov with some modifications
     <a href="https://www.flickr.com/photos/plastiqphotos/4562667101/in/photolist-7XbRYa-nLndH-8NeFVR-5Zb2BK-4GFsHK-7Cs4qq-Ry1qd-8w4bhR-5iCBfB-jfBmE4-oKebHf-cxruph-fpmM79-ibPN36-nLndG-hZkxZY-hs3kUC-2QnBk6-67wGYy-hDsqrP-4r6weH-iQzSPk-dtJb4-FmLG9-9sxtRx-bsJho-4adoJP-5eNhK-ieyXUm-8wGEL4-71KfqD-8LRRTC-abFr6g-frkQEK-e3jN6x-BQ2cM-4raBb9-hSPrrL-opGMQ7-f9tFMJ-7Cs7Eu-8phpkD-Bc2C3-cyt9US-pDe9o-8Ps6kN-5jpWRt-9twxAU-5jtRTj-6WY2Uk">(orginal)</a>.
     Used under a <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC sharealike license</a>.
+
+<br/><br/>
+
 </div>

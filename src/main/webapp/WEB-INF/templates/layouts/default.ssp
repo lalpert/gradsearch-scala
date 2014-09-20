@@ -2,6 +2,7 @@
 <%@ var title: String %>
 <%@ var head: String = "" %>
 <%@ var userEmail: String = "" %>
+<%@ var currentPage: String = "" %>
 
 <html>
 <head>
@@ -48,13 +49,13 @@
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
+              <li class="#if (currentPage == "home") active #end"><a href="/">Home</a></li>
+              <li class="#if (currentPage == "about") active #end"><a href="/about">About</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li>
               #if (userEmail == "")
-                <a href="/login">Log In</a>
+                <a class="#if (currentPage == "login") active #end" href="/login">Log In</a>
               #else
                 <p class="navbar-text">Signed in as <a href="#" class="navbar-link">${userEmail}</a>. <a href="/logout">Logout</a></p>
               #end
