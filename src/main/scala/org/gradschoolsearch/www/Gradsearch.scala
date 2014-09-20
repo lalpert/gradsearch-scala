@@ -34,7 +34,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
   protected implicit val jsonFormats: Formats = DefaultFormats
 
   // TODO: move me somewhere proper
-  val defaultImage = "http://placehold.it/100x127"
+  val defaultImage = "/images/no-photo.jpg"
 
   // Before every action runs, set the content type to be in JSON format.
   before() {
