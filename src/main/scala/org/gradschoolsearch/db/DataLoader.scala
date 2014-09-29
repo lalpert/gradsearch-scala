@@ -13,7 +13,7 @@ object DataLoader {
   case class ProfWithKeywords(professor: DBProfessor, keywords: List[String])
   private case class InternalFormat(school: String, name: String, research_summary: Option[String], image: Option[String], source: Option[String],
                                      keywords: List[String], department: Option[String])
-  val schools = List("stanford", "penn", "mit")
+  val schools = List("stanford", "penn", "mit", "yale", "hbs")
   val dataFields = schools.map(school => f"src/main/resources/data/$school.dat.json")
   implicit val formats = DefaultFormats
   def loadData() = {
