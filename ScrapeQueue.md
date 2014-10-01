@@ -1,0 +1,14 @@
+- [ ] Princeton
+- [ ] Harvard
+- [ ] More MIT
+- [ ] More Yale
+- [ ] Columbia
+- [ ] University of Chicago
+- [ ] Duke
+- [ ] More UPenn
+- [ ] CalTech
+- [ ] UCSF
+- [ ] Dartmouth
+- [ ] CMU
+- [ ] Johns Hopkins
+- [ ] Brown
