@@ -114,7 +114,10 @@ var ModalDiv = React.createClass({
     var showMoreFunc = this.state.expanded ? this.showLess : this.showMore;
     var showMoreText = this.state.expanded ? "less" : "more"
     var showMoreDiv = <a href="#" className="toggle-more" onClick={showMoreFunc}>Show {showMoreText}</a>;
-
+    var image = "";
+    if (this.props.currentProf.image != "") {
+      image = <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt="Generic placeholder image"/>;
+    }
     return <div className="modal fade" id="profModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div className="modal-dialog" onKeyPress={this.hello}>
         <div className="modal-content">
@@ -125,8 +128,7 @@ var ModalDiv = React.createClass({
           </div>
           <div className="modal-body prof-modal-body">
             <div className="modal-above-fold">
-              <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt="Generic placeholder image"/>
-              
+              {image}
               <p>{this.props.currentProf.school}</p>
               <p>{this.props.currentProf.department}</p>
               <strong>Research Interests:</strong>
