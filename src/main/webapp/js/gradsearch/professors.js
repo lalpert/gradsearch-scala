@@ -42,7 +42,7 @@ var ProfBox = React.createClass({
 
   setStarred: function(event) {
     event.stopPropagation();
-    this.props.setStarred(this.props.profData.id, !this.props.profData.starred)
+    this.props.setStarred(this.props.profData.id, !this.props.profData.starred);
   },
 
   formatKeywords: function(keywords) {

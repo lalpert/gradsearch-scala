@@ -283,6 +283,7 @@ var SearchPage = React.createClass({
             currentProf={currentProf}
             showNextProf={this.showNextProf}
             hideModal={this.hideModal}
+            setStarred={this.setStarred}
           />
         </div>
 

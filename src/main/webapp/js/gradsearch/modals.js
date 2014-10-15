@@ -20,6 +20,7 @@ var ModalDiv = React.createClass({
     currentProf: React.PropTypes.object,
     showNextProf: React.PropTypes.func,
     hideModal: React.PropTypes.func,
+    setStarred: React.PropTypes.func.isRequired,
   },
 
   mixins: [PageSwipelMixin],
@@ -40,6 +41,10 @@ var ModalDiv = React.createClass({
 
   componentDidMount: function() {
 
+  },
+
+  setStarred: function(event) {
+    this.props.setStarred(this.props.currentProf.id, !this.props.currentProf.starred);
   },
 
   componentDidUpdate: function(prevProps) {
@@ -116,13 +121,16 @@ var ModalDiv = React.createClass({
     var showMoreDiv = <a href="#" className="toggle-more" onClick={showMoreFunc}>Show {showMoreText}</a>;
     var image = "";
     if (this.props.currentProf.image != "") {
-      image = <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt="Generic placeholder image"/>;
+      image = <img className="pull-left media-object prof-image prof-pic" src={this.props.currentProf.image} alt=""/>;
     }
     return <div className="modal fade" id="profModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div className="modal-dialog" onKeyPress={this.hello}>
         <div className="modal-content">
           <div className="modal-header">
             <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+            <div className="prof-star-div" onClick={this.setStarred}>
+              <img src={"/images/" + starImg} height="25px"/>
+            </div>
             <h4 className="modal-title" id="myModalLabel">{this.props.currentProf.name}</h4>
 
           </div>

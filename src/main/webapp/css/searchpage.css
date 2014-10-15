@@ -44,6 +44,11 @@ footer {
   height: 20px;
  }
 
+.prof-star-div {
+  float: left;
+  padding-right: 10px;
+}
+
 .search-star {
   position: relative;
   top: -3px;
