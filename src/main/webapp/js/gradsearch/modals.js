@@ -3,11 +3,43 @@
 /**
  * The div that might show a prof modal
  */
+
+var PageSwipelMixin = {
+    componentDidMount: function() {
+      $(window).on('swipeleft', this.swipeLeft);
+      $(window).on('swiperight', this.swipeRight);
+    },
+    componentWillUnmount: function() {
+        window.removeEventListener('swipeLeft', this.swipeLeft, false);
+        window.removeEventListener('swipeRight', this.swipeRight, false);
+    }
+};
+
 var ModalDiv = React.createClass({
   propTypes: {
     currentProf: React.PropTypes.object,
     showNextProf: React.PropTypes.func,
     hideModal: React.PropTypes.func,
+  },
+
+  mixins: [PageSwipelMixin],
+
+  getInitialState: function() {
+    return {
+      expanded: false 
+    }
+  },
+
+  swipeLeft: function() {
+    this.props.showNextProf("next");
+  },
+
+  swipeRight: function() {
+    this.props.showNextProf("prev");
+  },
+
+  componentDidMount: function() {
+
   },
 
   componentDidUpdate: function(prevProps) {
@@ -21,7 +53,27 @@ var ModalDiv = React.createClass({
         self.props.hideModal();
         self.removeKeyBinding();
       });
-    } 
+    }
+
+    if (prevProps.currentProf != this.props.currentProf) {
+      $('.prof-bio').removeClass('modal-text-showless');
+      if ($('.prof-bio').height() <= 100) {
+         $('.toggle-more').hide();
+      } else {
+        $('.toggle-more').show();
+      }
+    }
+  
+    if (!this.state.expanded) {
+        $('.prof-bio').addClass('modal-text-showless');
+    } else {
+        console.log("removing");
+        $('.prof-bio').removeClass('modal-text-showless');
+    }    
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({expanded: false});
   },
 
   addKeyBinding: function() {
@@ -42,8 +94,15 @@ var ModalDiv = React.createClass({
   },
 
   removeKeyBinding: function() {
-    console.log("unbinding");
     $(document).unbind('keydown');
+  },
+
+  showMore: function() {
+    this.setState({expanded: true});
+  },
+
+  showLess: function() {
+     this.setState({expanded: false});
   },
 
   render: function() {
@@ -52,6 +111,9 @@ var ModalDiv = React.createClass({
     }
 
     var starImg = this.props.currentProf.starred ? "gold_star.png" : "gray_star.png";
+    var showMoreFunc = this.state.expanded ? this.showLess : this.showMore;
+    var showMoreText = this.state.expanded ? "less" : "more"
+    var showMoreDiv = <a href="#" className="toggle-more" onClick={showMoreFunc}>Show {showMoreText}</a>;
 
     return <div className="modal fade" id="profModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div className="modal-dialog" onKeyPress={this.hello}>
@@ -71,7 +133,8 @@ var ModalDiv = React.createClass({
               <p>{this.props.currentProf.keywords.join(", ")}</p>
             </div>
             <hr/>
-            <div dangerouslySetInnerHTML={{__html: this.props.currentProf.bio}} />
+            <div className="prof-bio" dangerouslySetInnerHTML={{__html: this.props.currentProf.bio}} />
+            {showMoreDiv}
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-default"
