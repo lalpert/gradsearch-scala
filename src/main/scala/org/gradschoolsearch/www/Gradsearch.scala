@@ -59,15 +59,19 @@ class Gradsearch(val db: Database) extends GradsearchStack
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
 
-    println(f"CURRENT USER $userOption")
-
     val starredFilter = params.get("Starred") == Some("Starred")
     val schoolFilter = multiParams("University")
     val deptFilter = multiParams("Department")
 
     def toMap(params: Seq[String]): Map[String, Boolean] = params.map(p => (p, true)).toMap
+    val currentPage = if (params.get("clicked") == Some("true")) {
+      "starredProfessors"
+    } else {
+      "search"
+    }
+
     ssp("/search",
-      "currentPage" -> "search",
+      "currentPage" -> currentPage,
       "search" -> searchString, 
       "userEmail" -> getCurrentUserEmail, 
       "loggedIn" -> userOption.isDefined,
@@ -225,11 +229,9 @@ class Gradsearch(val db: Database) extends GradsearchStack
 
   get("/starred-search") {
     val searchString = params("searchString")
-    println(searchString)
     userOption match {
       case Some(currentUser) => {
         db withDynSession {
-          println(f"In /starred-search")
           val existingSearch = starredSearches.filter(
             pair => (pair.searchString === searchString && pair.userId === currentUser.id.get))
           existingSearch.length.run > 0
@@ -251,11 +253,9 @@ class Gradsearch(val db: Database) extends GradsearchStack
         val searchString = params("searchString")
         val starred = params("starred").toBoolean
         val userId = currentUser.id.get
-        println(f"Setting starred ${searchString}, ${starred}")
         val existingSearch = starredSearches.filter(
           pair => (pair.searchString === searchString && pair.userId === userId))
         val pairExists = (existingSearch.length.run > 0)
-        println(f"Exists: ${pairExists}")
 
         if (starred && !pairExists) {
           // We need to put this pair in the db

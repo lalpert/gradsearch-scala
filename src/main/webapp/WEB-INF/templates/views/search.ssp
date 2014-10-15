@@ -5,8 +5,9 @@
 <%@ val loggedIn: Boolean %>
 <%@ val isFullUser: Boolean %>
 <%@ val filters: String %>
+<%@ val currentPage: String %>
 
-<% render("searchBar.ssp", Map("currentPage" -> "search")) %>
+<% render("searchBar.ssp", Map("currentPage" -> currentPage)) %>
 
 <div id="container"></div>
 
