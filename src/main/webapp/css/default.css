@@ -11,3 +11,15 @@
   margin-bottom: 0px;
 }
 
+.display-none {
+  display: none;
+}
+
+.buffer {
+  height: 15px;
+}
+
+.btn-tall {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

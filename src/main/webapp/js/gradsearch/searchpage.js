@@ -287,7 +287,7 @@ var SearchPage = React.createClass({
         </div>
 
         <div className="col-sm-3">
-          <FilterBar
+          <FilterWrapper
             onChange={this.updateFilters}
             clearSection={this.clearSection}
             filterOptions={this.state.filterOptions}

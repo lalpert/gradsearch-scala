@@ -1,5 +1,39 @@
 /** @jsx React.DOM */
 
+var FilterWrapper = React.createClass({
+
+    getInitialState: function() {
+      return {show: false};
+    },
+
+    toggleText: function() {
+        console.log("test");
+        this.setState({show: !this.state.show, test: "test"});
+    },
+
+    render: function() {
+        var buttonText = this.state.show ? "Hide filters" : "Show filters";
+        var filters = this.transferPropsTo(<FilterBar/>);
+
+        return <div>
+           <button type="button"
+                   onClick={this.toggleText}
+                   className="btn btn-primary btn-block btn-tall visible-xs-block"
+                   data-toggle="collapse" data-target="#filter-div">
+             {buttonText}
+           </button>
+
+           <div id="filter-div" className="collapse">
+               {filters}
+           </div>
+
+           <div className="visible-xs-block buffer"></div>
+         </div>;
+
+    },
+});
+
+
 /**
  * Filter bar on the left of the search page that lets users filter by starred, university, and department.
  */

@@ -29,6 +29,16 @@ footer {
   }
 }
 
+@media (min-width: 768px) {
+  #filter-div {
+    display:block;
+  }
+}
+
+.show-filter-btn {
+    margin-bottom: 15px;
+}
+
 .star-div {
   float: right;
   height: 20px;
