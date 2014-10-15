@@ -68,7 +68,7 @@
   ${unescape(body)}
 <div class="footer">
   <div class="footer-container">
-    <p class="text-muted">Copyright Leah and Russell Productions. All rights reserved.
+    <p class="text-muted">&copy; Leah and Russell Productions.
     <a href="https://github.com/lalpert/gradsearch-scala">Source code.</a></p>
   </div>
 </div>
