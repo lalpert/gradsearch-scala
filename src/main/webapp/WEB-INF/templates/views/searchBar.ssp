@@ -15,12 +15,12 @@
       </div>
     </div>
 
-    <div class="navbar-collapse collapse">
+
       <ul class="nav navbar-nav">
         <li class="#if (currentPage == "starredSearches") active #end"><a href="/starred-searches">Starred searches</a></li>
         <li><a href="/search?q=&Starred=Starred">Starred professors</a></li>
       </ul>
-    </div><!--/.nav-collapse -->
+
 
   </div>
 </div>

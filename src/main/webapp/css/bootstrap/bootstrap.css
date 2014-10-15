@@ -2636,7 +2636,11 @@ select[multiple].input-lg {
   margin-bottom: 10px;
   color: #737373;
 }
-@media (min-width: 768px) {
+
+/* Commenting out this media line so I can use inline forms on smaller screens.
+   TODO: Is there a better way to accomplish this?
+*/
+/*@media (min-width: 768px) {*/
   .form-inline .form-group {
     display: inline-block;
     margin-bottom: 0;
@@ -2682,7 +2686,7 @@ select[multiple].input-lg {
   .form-inline .has-feedback .form-control-feedback {
     top: 0;
   }
-}
+/*}*/
 .form-horizontal .radio,
 .form-horizontal .checkbox,
 .form-horizontal .radio-inline,

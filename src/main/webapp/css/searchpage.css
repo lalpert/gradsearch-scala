@@ -23,6 +23,12 @@ footer {
   margin: 9px 17px 0px 0px;
 }
 
+@media (max-width: 768px) {
+  .header-searchbar {
+    margin-left: 10px;
+  }
+}
+
 .star-div {
   float: right;
   height: 20px;
