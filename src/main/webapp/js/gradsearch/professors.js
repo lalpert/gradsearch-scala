@@ -53,12 +53,17 @@ var ProfBox = React.createClass({
     var prof = this.props.profData;
     var starImg = this.props.profData.starred ? "gold_star.png" : "gray_star.png";
 
+    var imgSrc = this.props.profData.image;
+    var profImage = imgSrc ?
+      <a className="pull-left prof-pic" href="#">
+        <img className="media-object prof-image" src={imgSrc}/>
+      </a> :
+      "";
+
     return (
       <div className="col-sm-6 col-lg-4 grid-spacing">
         <div className="thumbnail prof-div" onClick={this.handleClick}>
-          <a className="pull-left prof-pic" href="#">
-            <img className="media-object prof-image" src={this.props.profData.image} alt="Generic placeholder image"/>
-          </a>
+          {profImage}
           <div className="star-div" onClick={this.setStarred}>
             <img src={"/images/" + starImg} height="20px"/>
           </div>
@@ -76,5 +81,12 @@ var ProfBox = React.createClass({
         </div>
       </div>
     );
+  },
+
+  componentDidMount: function() {
+    // If there's an error loading the image, don't show the image
+    $('img').on('error', function() {
+        $(this).hide();
+    });
   }
 });
