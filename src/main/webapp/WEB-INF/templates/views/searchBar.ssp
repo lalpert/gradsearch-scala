@@ -16,11 +16,12 @@
     </div>
 
 
-      <ul class="nav navbar-nav">
-        <li class="#if (currentPage == "starredSearches") active #end"><a href="/starred-searches">Starred searches</a></li>
-        <li><a href="/search?q=&Starred=Starred">Starred professors</a></li>
-      </ul>
-
+    <ul class="nav navbar-nav">
+      <li class="#if (currentPage == "starredSearches") active #end"><a href="/starred-searches">Starred searches</a></li>
+      <li class="#if (currentPage == "starredProfessors") active #end">
+        <a href="/search?q=&Starred=Starred&clicked=true">Starred professors</a>
+      </li>
+    </ul>
 
   </div>
 </div>

@@ -150,6 +150,15 @@ float:left;
   opacity: 0.01;
 }
 
+.modal-text-showmore {
+  /* no op, I think */
+}
+
+.modal-text-showless {
+  max-height: 100px;
+  overflow: hidden;
+}
+
  /*
   * Off Canvas
   * --------------------------------------------------

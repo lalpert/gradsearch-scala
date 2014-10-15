@@ -5,13 +5,14 @@
 <%@ val loggedIn: Boolean %>
 <%@ val isFullUser: Boolean %>
 <%@ val filters: String %>
+<%@ val currentPage: String %>
 
-<% render("searchBar.ssp", Map("currentPage" -> "search")) %>
+<% render("searchBar.ssp", Map("currentPage" -> currentPage)) %>
 
 <div id="container"></div>
 
 <link href="/css/searchpage.css" rel="stylesheet">
-
+<script src="/js/jquery/jquery.mobile.custom.min.js"></script>
 <script type="text/jsx" src="/js/gradsearch/searchpage.js"></script>
 <script type="text/jsx" src="/js/gradsearch/searchInfo.js"></script>
 <script type="text/jsx" src="/js/gradsearch/modals.js"></script>
