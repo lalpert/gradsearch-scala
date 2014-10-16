@@ -32,11 +32,15 @@ var ModalDiv = React.createClass({
   },
 
   swipeLeft: function() {
-    this.props.showNextProf("next");
+    if (this.props.currentProf) {
+      this.props.showNextProf("next");
+    }
   },
 
   swipeRight: function() {
-    this.props.showNextProf("prev");
+    if (this.props.currentProf) {
+      this.props.showNextProf("prev");
+    }
   },
 
   componentDidMount: function() {
