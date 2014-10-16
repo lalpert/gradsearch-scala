@@ -60,7 +60,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val searchString = params.getOrElse("term", "")
       // TODO: sort by most popular?
       val words = keywords.filter(_.keyword.startsWith(searchString)).map(_.keyword)
-      words.run
+      words.take(10).run
     }
   }
 

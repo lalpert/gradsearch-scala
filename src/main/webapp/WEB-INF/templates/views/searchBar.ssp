@@ -8,7 +8,7 @@
       <div>
         <form action="/search" method="get" class="form-inline header-searchbar" role="form">
           <div class="form-group">
-            <input type="text" name="q" class="form-control" id="navbar-search-box">
+            <input type="text" name="q" class="autocomplete form-control" id="navbar-search-box">
           </div>
           <button type="submit" class="btn btn-default">Go</button>
         </form>
@@ -25,3 +25,7 @@
 
   </div>
 </div>
+
+<script>
+ autocomplete();
+</script>

@@ -18,7 +18,7 @@ re:search
   <form class="form-inline" role="form" action="search">
     <div class="form-group form-group-">
       <label class="sr-only" for="lab">What are you interested in?</label>
-      <input id="autocomplete" name="q" class="form-control input-sm search-box" placeholder="">
+      <input name="q" class="autocomplete form-control input-sm search-box" placeholder="">
     </div>
     <button type="submit" class="search-button btn btn-primary btn-sm">Go</button>
   </form>
@@ -28,7 +28,6 @@ re:search
   </p>
 </div>
 
-
 <script>
-$( "#autocomplete" ).autocomplete({source: "/autocomplete"});
+ autocomplete();
 </script>

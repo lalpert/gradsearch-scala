@@ -11,12 +11,13 @@
   
   <script src="/js/react/react-with-addons.js"></script>
   <script src="/js/react/JSXTransformer.js"></script>
-  <script type="text/jsx" src="/js/gradsearch/testcomponent.js"></script>
   <script src="/js/jquery/jquery-1.11.1.min.js"></script>
   <script src="/js/underscore/underscore-min.js"></script>
   <script src="/js/bootstrap/bootstrap.js"></script>
   <script src="/js/jquery-cookie-1.4.1/jquery.cookie.js"></script>
   <script src="/js/jquery-ui-1.11.1/jquery-ui.js"></script>
+
+  <script src="/js/gradsearch/autocomplete.js"></script>
 
   <link href="/js/jquery-ui-1.11.1/jquery-ui.css" rel="stylesheet">
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
