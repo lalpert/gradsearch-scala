@@ -16,10 +16,15 @@
   <script src="/js/underscore/underscore-min.js"></script>
   <script src="/js/bootstrap/bootstrap.js"></script>
   <script src="/js/jquery-cookie-1.4.1/jquery.cookie.js"></script>
+  <script src="/js/jquery-ui-1.11.1/jquery-ui.js"></script>
+
+  <link href="/js/jquery-ui-1.11.1/jquery-ui.css" rel="stylesheet">
   <link href="/css/bootstrap/bootstrap.css" rel="stylesheet">
   <link href="/css/bootstrap/sticky-footer.css" rel="stylesheet">
   <link href="/css/default.css" rel="stylesheet">
+
   <link rel="icon" type="image/png" href="/images/grad-cap.png">
+
   </head>
   ${unescape(head)}
 

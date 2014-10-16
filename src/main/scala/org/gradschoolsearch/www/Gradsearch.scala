@@ -55,6 +55,15 @@ class Gradsearch(val db: Database) extends GradsearchStack
     ssp("/home", "userEmail" -> getCurrentUserEmail, "currentPage" -> "home")
   }
 
+  get("/autocomplete") {
+    db withDynSession {
+      val searchString = params.getOrElse("term", "")
+      // TODO: sort by most popular?
+      val words = keywords.filter(_.keyword.startsWith(searchString)).map(_.keyword)
+      words.run
+    }
+  }
+
   get("/search") {
     contentType="text/html"
     val searchString = params.getOrElse("q", "")
