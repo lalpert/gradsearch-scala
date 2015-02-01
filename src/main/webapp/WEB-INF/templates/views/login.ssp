@@ -32,11 +32,4 @@ Login/Register
 
 
 </div> <!-- /container -->
-<script type="text/jsx" src="/js/gradsearch/login.js"></script>
-<script type="text/jsx">
-/** @jsx React.DOM */
-React.renderComponent(
-    <Login/>,
-    document.getElementById('login-inputs')
-);
-</script>
+<script type="text/jsx" src="/js/dist/login.js"></script>

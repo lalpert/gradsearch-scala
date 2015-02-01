@@ -28,6 +28,9 @@ Re:search requires a locally running mysql. Install mysql onto your local system
 ```sh
 $ cd gradsearch
 $ ./prep-db.sh   (enter password)
+$ brew install nodejs # or however you install node
+$ npm install -g browserify
+$ npm install -g watchify
 $ ./sbt
 > container:start
 > browse
