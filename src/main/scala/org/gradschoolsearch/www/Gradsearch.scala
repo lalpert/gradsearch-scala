@@ -1,7 +1,7 @@
 package org.gradschoolsearch.www
 
 import org.gradschoolsearch.db.Tables._
-import org.gradschoolsearch.db.{DbRoutes, Tables}
+import org.gradschoolsearch.db.{DbRoutes, Tables, Match}
 import org.gradschoolsearch.models.{DBProfessor, User, Professor, WebProfessor}
 import org.gradschoolsearch.www.Auth.AuthenticationSupport
 import org.mindrot.jbcrypt.BCrypt
@@ -112,12 +112,12 @@ class Gradsearch(val db: Database) extends GradsearchStack
     // Professors whose keywords match the search string
     val profKeywordJoin = for {
       pk <- professorKeywords
-      k <- keywords if k.id === pk.keywordId && fullTextMatch(searchString, false, "keyword")
+      k <- keywords if k.id === pk.keywordId && (Match(k.keyword) against searchString)
       p <- professors if p.id === pk.profId
     } yield p
 
     // Professors whose name, school, or department match the search string
-    val profFilter = professors.filter(prof => fullTextMatch(searchString, true, "name", "department", "school"))
+    val profFilter = professors.filter(prof => (Match(prof.name, prof.department, prof.school) against f"$searchString*"))
 
     // Return query for all professors matching the search term
     (profKeywordJoin union profFilter)
@@ -166,7 +166,7 @@ class Gradsearch(val db: Database) extends GradsearchStack
       val prof = stuffList.head._1
       val words = stuffList.map(_._2)
       val starred = sp.contains(prof.id.get)
-      new WebProfessor(prof, words, starred, prof.image.getOrElse(defaultImage), prof.bio.getOrElse(f"${prof.name} doesn't have a bio. <a>Add one!</a>"))
+      new WebProfessor(prof, words, starred, prof.image.getOrElse(defaultImage), prof.bio.getOrElse(f"${prof.name} doesn't ha2ve a bio. <a>Add one!</a>"))
     }
 
     results.toList

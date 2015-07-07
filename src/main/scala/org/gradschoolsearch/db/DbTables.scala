@@ -6,20 +6,19 @@ import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.lifted.Column
 
 
-object Tables {
-  // Dark magic that allows us to filter queries with full-text search
-  def fullTextMatch[T](term: String, wildcard: Boolean, columns: String*): Column[Boolean] = {
-    val column = columns mkString ","
-    val str = if (wildcard) {
-      f"match($column) against ('$term*' in boolean mode)"
-    } else {
-      f"""match($column) against ('"$term"' in boolean mode)"""
-    }
-    SimpleExpression.nullary[Boolean] { (qb) =>
-      qb.sqlBuilder += str
-    }
-  }
+case class Match(cols: Column[_]*) {
+   def against(what: Column[_]) =
+     SimpleExpression[Boolean]{ case (nodes, qb) =>
+       qb.sqlBuilder += "MATCH("
+       qb.sqlBuilder.sep(nodes, ", ")(qb.expr(_)) // not cols.map(_.toNode)
+       qb.sqlBuilder += ") AGAINST("
+       qb.expr(what.toNode)
+       qb.sqlBuilder += " in boolean mode"
+       qb.sqlBuilder += ")"
+     }.apply(cols)
+}
 
+object Tables {
   // Professor data
   class Professors(tag: Tag) extends Table[DBProfessor](tag, "PROFESSORS") {
     def id      = column[Int]("ID", O.PrimaryKey, O.AutoInc)
