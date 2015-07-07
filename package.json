@@ -1,0 +1,22 @@
+{
+  "name": "gradsearch-scala",
+  "version": "1.0.0",
+  "description": "## About ## Re:search is a website that lets you enter your research interests (such as \"robotics\", \"mechanical engineering\", or \"systems biology\") and find professors who are researching similar things.",
+  "main": "test.js",
+  "dependencies": {
+    "react": "^0.12.2",
+    "react-addons": "^0.9.1-deprecated",
+    "reactify": "^1.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lalpert/gradsearch-scala"
+  },
+  "author": "Russell Cohen & Leah Alpert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lalpert/gradsearch-scala/issues"
+  },
+  "homepage": "https://github.com/lalpert/gradsearch-scala"
+}

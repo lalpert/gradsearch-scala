@@ -19,4 +19,5 @@ class Professor(scrapy.Item):
     source = scrapy.Field()
     email = scrapy.Field()
     personal_website = scrapy.Field()
-    lab_webiste = scrapy.Field()
+    lab_website = scrapy.Field()
+    title = scrapy.Field()

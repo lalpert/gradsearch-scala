@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+var React = require("react/addons");
 var Login = React.createClass({
 
   getInitialState: function() {
@@ -113,3 +114,5 @@ var Validator = React.createClass({
 		}
 	}
 });
+
+module.exports = Login;

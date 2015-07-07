@@ -23,11 +23,14 @@ We'd love help with:
 * File an issue. If it's broken or something you want to see, let us know!
 
 ## Build & Run ##
-Re:search requires a locally running mysql. Install mysql onto your local system for running gradsearch. Use the Scala build tool (sbt) to run Re:search locally. Using JRebel significantly improves sbt reload times.
+Re:search requires a locally running mysql. Install mysql onto your local system for running gradsearch. Use the Scala build tool (sbt) to run Re:search locally.
 
 ```sh
 $ cd gradsearch
 $ ./prep-db.sh   (enter password)
+$ brew install nodejs # or however you install node
+$ npm install -g browserify
+$ npm install -g watchify
 $ ./sbt
 > container:start
 > browse
